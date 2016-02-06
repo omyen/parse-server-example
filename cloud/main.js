@@ -1,6 +1,6 @@
 
 Parse.Cloud.define('feedPet', function(req, res) {
-	console.log(TAG + ' [feedPet] Info=\'Running cloud code\' petID=' + req.params.petID + 'fedBy=' + req.params.fedBy + 'fedAt=' + req.params.fedAt);
+	console.log('[feedPet] Info=\'Running cloud code\' petID=' + req.params.petID + 'fedBy=' + req.params.fedBy + 'fedAt=' + req.params.fedAt);
 	var FeedingLog = Parse.Object.extend("FeedingLog");
 	var feedingLog = new FeedingLog();
 	
@@ -13,19 +13,19 @@ Parse.Cloud.define('feedPet', function(req, res) {
 	var mPet;
 
 	queryPet.get(req.params.petID).then(function(pet) {
-			console.log(TAG + ' [feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
+			console.log('[feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
 			return feedingLog.save();
 		}).then(function(feedingLog){
-			console.log(TAG + ' [feedPet] Info=\'Saved feedingLog successfully\'');
+			console.log('[feedPet] Info=\'Saved feedingLog successfully\'');
 			var relation = mPet.relation('feedingLogs');
 			relation.add(feedingLog);
 			return mPet.save();
 		}).then(function(pet){
-			console.log(TAG + ' [feedPet] Info=\'Saved pet successfully\'');
+			console.log('[feedPet] Info=\'Saved pet successfully\'');
 			res.success(pet);
 		}, function(error) {
-			console.log(TAG + ' [feedPet] Info=\'feedPet failed\' error=' + error.message);
+			console.log('[feedPet] Info=\'feedPet failed\' error=' + error.message);
 			res.error(error);
 		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
 });

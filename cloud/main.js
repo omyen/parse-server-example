@@ -1,7 +1,7 @@
 
 Parse.Cloud.define('feedPet', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	console.log('[feedPet] Info=\'Running cloud code\' petID=' + req.params.petID + ' fedBy=' + req.params.fedBy + ' fedAt=' + req.params.fedAt);
+	console.log('[feedPet] Info=\'Running cloud code\' petId=' + req.params.petId + ' fedBy=' + req.params.fedBy + ' fedAt=' + req.params.fedAt);
 	var FeedingLog = Parse.Object.extend("FeedingLog");
 	var feedingLog = new FeedingLog();
 	
@@ -13,7 +13,7 @@ Parse.Cloud.define('feedPet', function(req, res) {
 	
 	var mPet;
 
-	queryPet.get(req.params.petID).then(function(pet) {
+	queryPet.get(req.params.petId).then(function(pet) {
 			console.log('[feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
 			return feedingLog.save();
@@ -27,6 +27,6 @@ Parse.Cloud.define('feedPet', function(req, res) {
 			res.success(pet);
 		}, function(error) {
 			console.log('[feedPet] Info=\'feedPet failed\' error=' + error.message);
-			res.error(error);
+			res.error(error.message);
 		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
 });

@@ -1,6 +1,7 @@
 
 Parse.Cloud.define('feedPet', function(req, res) {
 	res.success('Hi');
+	console.log('Hi');
 	/*var feedingLog = req.params.feedingLog;
 	var pet = req.params.pet;
 	

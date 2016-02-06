@@ -1,6 +1,7 @@
 
 Parse.Cloud.define('feedPet', function(req, res) {
-	console.log('[feedPet] Info=\'Running cloud code\' petID=' + req.params.petID + 'fedBy=' + req.params.fedBy + 'fedAt=' + req.params.fedAt);
+	Parse.Cloud.useMasterKey();
+	console.log('[feedPet] Info=\'Running cloud code\' petID=' + req.params.petID + ' fedBy=' + req.params.fedBy + ' fedAt=' + req.params.fedAt);
 	var FeedingLog = Parse.Object.extend("FeedingLog");
 	var feedingLog = new FeedingLog();
 	

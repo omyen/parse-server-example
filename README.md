@@ -82,10 +82,10 @@ curl -X POST \
   http://localhost:1337/parse/classes/GameScore
   
 curl -X POST \
-  -H "X-Parse-Application-Id: myAppId" \
+  -H "X-Parse-Application-Id: zYm28TE2xRtPog4Icg2s599XlS65CoVBQtjMjg3a" \
   -H "Content-Type: application/json" \
   -d '{}' \
-  http://localhost:1337/parse/functions/hello
+  https://hidden-hamlet-11276.herokuapp.com/parse/functions/hello
 ```
 
 Example using it via JavaScript:

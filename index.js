@@ -12,7 +12,7 @@ if (!databaseUri) {
 
 var api = new ParseServer({
   databaseURI: databaseUri || 'mongodb://localhost:27017/dev',
-  cloud: process.env.CLOUD_CODE_MAIN,
+  cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
   appId: process.env.APP_ID || 'myAppId',
   masterKey: process.env.MASTER_KEY || '' //Add your master key here. Keep it secret!
 });
@@ -28,7 +28,7 @@ app.use(mountPath, api);
 
 // Parse Server plays nicely with the rest of your web routes
 app.get('/', function(req, res) {
-  res.status(200).send('DoubleDip v3');
+  res.status(200).send('DoubleDip v4');
 });
 
 var port = process.env.PORT || 1337;

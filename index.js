@@ -28,7 +28,7 @@ app.use(mountPath, api);
 
 // Parse Server plays nicely with the rest of your web routes
 app.get('/', function(req, res) {
-  res.status(200).send('DoubleDip v4');
+  res.status(200).send('DoubleDip v5');
 });
 
 var port = process.env.PORT || 1337;

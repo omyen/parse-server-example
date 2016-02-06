@@ -1,6 +1,7 @@
 
 Parse.Cloud.define('feedPet', function(req, res) {
-	var feedingLog = req.params.feedingLog;
+	res.success('Hi');
+	/*var feedingLog = req.params.feedingLog;
 	var pet = req.params.pet;
 	
 	feedingLog.save({
@@ -19,5 +20,5 @@ Parse.Cloud.define('feedPet', function(req, res) {
 		error: function(error) {
 			res.error(error);
 		}
-	});
+	});*/
 });

@@ -19,6 +19,7 @@ Parse.Cloud.define('feedPet', function(req, res) {
 	queryPet.get(req.params.petId).then(function(pet) {
 			console.log('[feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
+			mPet.set('lastFed', req.params.fedAt);
 			return feedingLog.save();
 		}).then(function(feedingLog){
 			console.log('[feedPet] Info=\'Saved feedingLog successfully\'');

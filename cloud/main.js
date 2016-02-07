@@ -101,7 +101,7 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 	  query.startsWith("username_lowercase", req.params.searchTerm);
 	  query.find({
 		success: function(results) {
-		  res.success();
+		  res.success(results);
 		},
 		error: function() {
 		  res.error("movie lookup failed");

@@ -76,7 +76,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	});
 	
 	
-	res.success();
+	res.success('OK');
 });
 
 Parse.Cloud.define('searchFriend', function(req, res) {

@@ -86,7 +86,6 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 	  var query = new Parse.Query("_User");
 	  query.startsWith("username_lowercase", req.params.searchTerm);
 
-	  });
 	query.find().then(function(results){
 			res.success(results);
 		}, function(error){

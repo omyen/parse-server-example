@@ -83,8 +83,9 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	console.log('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
 
-	var query = new Parse.Query(Parse.User);
-	query.startsWith('username_lowercase', req.params.searchTerm);
+	var User = Parse.Object.extend('_User');
+	var query = new Parse.Query(User);
+	query.equalTo('username_lowercase', req.params.searchTerm);
 	query.limit(20);
 
 	query.find().then(function(results){

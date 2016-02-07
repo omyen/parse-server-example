@@ -99,13 +99,20 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 
 	  var query = new Parse.Query("_User");
 	  query.startsWith("username_lowercase", req.params.searchTerm);
-	  query.find({
+	  /*query.find({
 		success: function(results) {
 		  res.success(results);
 		},
 		error: function() {
 		  res.error("movie lookup failed");
 		}
-	  });		
+	  });*/
+	query.find().then(function(results){
+			console.log('[searchFriend] Info=\'Search successful\' searchTerm=' + searchTerm +' numberRetreived=' + results.length);
+			res.success(results);
+		}, function(error){
+			console.log('[searchFriend] Info=\'Search failed\' searchTerm=' + searchTerm +' error=' + error.message);
+			res.error(error.message);
+		});	  
 });
 

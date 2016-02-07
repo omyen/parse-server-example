@@ -81,10 +81,10 @@ Parse.Cloud.define('addFriend', function(req, res) {
 
 Parse.Cloud.define('searchFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	console.log('[searchFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
+	console.log('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
 
-	var Users = Parse.Object.extend('_User');
-	var query = new Parse.Query(Users);
+	var User = Parse.Object.extend('_User');
+	var query = new Parse.Query(User);
 	query.startsWith('username_lowercase', req.params.searchTerm);
 	query.limit(20);
 	

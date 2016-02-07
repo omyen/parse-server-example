@@ -98,13 +98,13 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 		*/
 
 	  var query = new Parse.Query("_User");
-	  query.equalTo("username", request.params.searchTerm);
+	  query.equalTo("username", req.params.searchTerm);
 	  query.find({
 		success: function(results) {
-		  response.success();
+		  res.success();
 		},
 		error: function() {
-		  response.error("movie lookup failed");
+		  res.error("movie lookup failed");
 		}
 	  });		
 });

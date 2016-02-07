@@ -97,14 +97,16 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 		});
 		*/
 
-	  var query = new Parse.Query("_User");
-	  query.equalTo("username", req.params.searchTerm);
+	  var query = new Parse.Query('_User');
+	  query.startsWith('username_lowercase', req.params.searchTerm);
 	  query.find({
 		success: function(results) {
-		  res.success();
+			console.log('[searchFriend] Info=\'Search successful\' searchTerm=' + searchTerm +' numberRetreived=' + results.length);
+			res.success(results);
 		},
 		error: function() {
-		  res.error("movie lookup failed");
+			console.log('[searchFriend] Info=\'Search failed\' searchTerm=' + searchTerm +' error=' + error.message);
+			res.error(error.message);
 		}
 	  });		
 });

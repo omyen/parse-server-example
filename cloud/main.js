@@ -16,6 +16,7 @@ Parse.Cloud.define('feedPet', function(req, res) {
 	
 	var mPet;
 
+	//user doesn't wait on this, so we can do it all sequentially
 	queryPet.get(req.params.petId).then(function(pet) {
 			console.log('[feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
@@ -34,3 +35,47 @@ Parse.Cloud.define('feedPet', function(req, res) {
 			res.error(error.message);
 		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
 });
+
+Parse.Cloud.define('addFriend', function(req, res) {
+	Parse.Cloud.useMasterKey();
+	console.log('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
+
+	//want a response that we set this immediately to confirm for the user - so let's reply as soon as we've set off the all the queries at once
+	//don't handle errors
+
+	//delete the request
+	var FriendRequest = Parse.Object.extend('FriendRequest');
+	var queryRequest = new Parse.Query(FriendRequest);
+	
+	queryRequest.get(req.params.requestId).then(function(friendRequest) {
+		console.log('[addFriend] Info=\'Found friendRequest from ID, deleting\'');
+		friendRequest.destroy();
+	})
+			
+	//add the friend to both users
+	
+	//delete the request
+	var User = Parse.Object.extend('_User');
+	var queryRequester = new Parse.Query(User);
+	var queryRequested = new Parse.Query(User);
+	
+	var mRequester;
+	
+	
+	queryRequester.get(req.params.requesterId).then(function(requester) {
+		console.log('[addFriend] Info=\'Found requester from ID\'');
+		mRequester= requester;
+		return queryRequested.get(req.params.requestedId);
+	}).then(function(requested) {
+		console.log('[addFriend] Info=\'Found requested from ID\'');
+		mRequester.relation('friends').add(requested);
+		requested.relation('friends').add(mRequester);
+		
+		mRequester.save();
+		requested.save();
+	});
+	
+	
+	res.success();
+});
+

@@ -83,16 +83,15 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	console.log('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
 
-	//var User = Parse.Object.extend('_User');
 	var query = new Parse.Query(Parse.User);
 	query.startsWith('username_lowercase', req.params.searchTerm);
-	//query.limit(20);
-	console.log('[searchFriend] Info=\'123Running cloud code\' searchTerm=' + req.params.searchTerm);
+	query.limit(20);
+
 	query.find().then(function(results){
-			console.log(TAG + ' [searchFriend] Info=\'Search successful\' searchTerm=' + searchTerm +' numberRetreived=' + results.length);
+			console.log('[searchFriend] Info=\'Search successful\' searchTerm=' + searchTerm +' numberRetreived=' + results.length);
 			res.success(results);
 		}, function(error){
-			console.log(TAG + ' [searchFriend] Info=\'Search failed\' searchTerm=' + searchTerm +' error=' + error.message);
+			console.log('[searchFriend] Info=\'Search failed\' searchTerm=' + searchTerm +' error=' + error.message);
 			res.error(error.message);
 		});
 			

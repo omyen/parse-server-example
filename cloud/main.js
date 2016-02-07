@@ -83,35 +83,14 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	console.log('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
 
-	/*var User = Parse.Object.extend('_User');
-	var query = new Parse.Query(User);
-	//query.equalTo('username_lowercase', req.params.searchTerm);
-	//query.limit(20);
-
-	query.find().then(function(results){
-			console.log('[searchFriend] Info=\'Search successful\' searchTerm=' + searchTerm +' numberRetreived=' + results.length);
-			res.success();
-		}, function(error){
-			console.log('[searchFriend] Info=\'Search failed\' searchTerm=' + searchTerm +' error=' + error.message);
-			res.error(error.message);
-		});
-		*/
-
 	  var query = new Parse.Query("_User");
 	  query.startsWith("username_lowercase", req.params.searchTerm);
-	  /*query.find({
-		success: function(results) {
-		  res.success(results);
-		},
-		error: function() {
-		  res.error("movie lookup failed");
-		}
+
 	  });*/
 	query.find().then(function(results){
-			console.log('[searchFriend] Info=\'Search successful\' searchTerm=' + searchTerm +' numberRetreived=' + results.length);
 			res.success(results);
 		}, function(error){
-		  res.error("movie lookup failed");
+			res.error(error.message);
 		});	  
 });
 

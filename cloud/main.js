@@ -108,7 +108,8 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 		}
 	  });*/
 	query.find().then(function(results){
-res.success(results);
+			console.log('[searchFriend] Info=\'Search successful\' searchTerm=' + searchTerm +' numberRetreived=' + results.length);
+			res.success(results);
 		}, function(error){
 		  res.error("movie lookup failed");
 		});	  

@@ -86,7 +86,7 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 	//var User = Parse.Object.extend('_User');
 	var query = new Parse.Query(Parse.User);
 	query.startsWith('username_lowercase', req.params.searchTerm);
-	query.limit(20);
+	//query.limit(20);
 	
 	query.find().then(function(results){
 			console.log(TAG + ' [searchFriend] Info=\'Search successful\' searchTerm=' + searchTerm +' numberRetreived=' + results.length);

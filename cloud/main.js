@@ -83,7 +83,7 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	console.log('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
 
-	var User = Parse.Object.extend('_User');
+	/*var User = Parse.Object.extend('_User');
 	var query = new Parse.Query(User);
 	//query.equalTo('username_lowercase', req.params.searchTerm);
 	//query.limit(20);
@@ -95,6 +95,17 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 			console.log('[searchFriend] Info=\'Search failed\' searchTerm=' + searchTerm +' error=' + error.message);
 			res.error(error.message);
 		});
-			
+		*/
+
+	  var query = new Parse.Query("_User");
+	  query.equalTo("username", request.params.searchTerm);
+	  query.find({
+		success: function(results) {
+		  response.success();
+		},
+		error: function() {
+		  response.error("movie lookup failed");
+		}
+	  });		
 });
 

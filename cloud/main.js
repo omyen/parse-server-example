@@ -1,4 +1,15 @@
 
+function contains(a, obj) {
+    var i = a.length;
+    while (i--) {
+       if (a[i] === obj) {
+           return true;
+       }
+    }
+    return false;
+}
+
+
 Parse.Cloud.define('feedPet', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	console.log('[feedPet] Info=\'Running cloud code\' petId=' + req.params.petId + ' fedBy=' + req.params.fedBy + ' fedAt=' + req.params.fedAt);
@@ -91,5 +102,51 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 		}, function(error){
 			res.error(error.message);
 		});	  
+});
+
+
+Parse.Cloud.define('manageFeeders', function(req, res) {
+	Parse.Cloud.useMasterKey();
+	console.log('[manageFeeders] Info=\'Running cloud code\' petId=' + req.params.petId + ' userId=' + req.params.userId);
+	
+	
+	var User = Parse.Object.extend('_User');
+	var queryUser = new Parse.Query(User);
+
+	var Pet = Parse.Object.extend('Pet');
+	var queryPet = new Parse.Query(Pet);
+	
+	var mPet;
+	var mUser;
+	var mFriends;
+
+	//user doesn't wait on this, so we can do it all sequentially
+	queryUser.get(req.params.userId).then(function(user) {
+			console.log('[manageFeeders] Info=\'Found user from ID\' username=' + user.get('username'));
+			mUser = user;
+			var queryFriends = user.relation('friends').query();
+			return queryFriends.run();
+		}).then(function(friends){
+			console.log('[manageFeeders] Info=\'Retrieved friends successfully\' numberRetrieved=' + friends.length);
+			mFriends= friends;
+			return queryPet.get(req.params.petId);
+		}).then(function(pet){
+			console.log('[feedPet] Info=\'Found pet from ID\' name=' + pet.get('name'));
+			mPet = pet;
+			var queryFeeders = pet.relation('users').query();
+			return queryFeeders.run();
+		}).then(function(feeders){
+			console.log('[manageFeeders] Info=\'Retrieved feeders successfully\' numberRetrieved=' + feeders.length);
+			mFriends.forEach(function(friend) {
+				if(contains(mFeeders, friend){
+					friend.isFeeder = true;
+				}
+			});
+			
+			res.success(mFriends);
+		}, function(error) {
+			console.log('[manageFeeders] Info=\'manageFeeders failed\' error=' + error.message);
+			res.error(error.message);
+		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
 });
 

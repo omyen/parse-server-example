@@ -136,7 +136,7 @@ Parse.Cloud.define('manageFeeders', function(req, res) {
 			mFriends= friends;
 			return queryPet.get(req.params.petId);
 		}).then(function(pet){
-			console.log('[feedPet] Info=\'Found pet from ID\' name=' + pet.get('name'));
+			console.log('[manageFeeders] Info=\'Found pet from ID\' name=' + pet.get('name'));
 			mPet = pet;
 			var queryFeeders = pet.relation('users').query();
 			return queryFeeders.find();
@@ -146,6 +146,7 @@ Parse.Cloud.define('manageFeeders', function(req, res) {
 			console.log('length=' + i);
 			while (i--) {
 				console.log('i=' + i);
+				arrayContains(mFeeders,friend);
 				if(arrayContains(mFeeders, friend)){
 					friend.isFeeder = true;
 				}

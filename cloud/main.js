@@ -96,7 +96,7 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 
 
 Parse.Cloud.define('manageFeeders', function(req, res) {
-	var utility = require('utility.js');
+	var utility = require('cloud/utility.js');
 
 	Parse.Cloud.useMasterKey();
 	console.log('[manageFeeders] Info=\'Running cloud code\' petId=' + req.params.petId + ' userId=' + req.params.userId);

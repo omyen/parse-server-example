@@ -98,7 +98,7 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 
 
 Parse.Cloud.define('manageFeeders', function(req, res) {
-	function contains(a, obj) {
+	function arrayContains(a, obj) {
 		console.log('contains');
 		/*var i = a.length;
 		console.log('length=' + i);
@@ -146,7 +146,7 @@ Parse.Cloud.define('manageFeeders', function(req, res) {
 			console.log('length=' + i);
 			while (i--) {
 				console.log('i=' + i);
-				if(contains(mFeeders, friend)){
+				if(arrayContains(mFeeders, friend)){
 					friend.isFeeder = true;
 				}
 			}

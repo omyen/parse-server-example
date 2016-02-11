@@ -1,7 +1,5 @@
 
 
-
-
 Parse.Cloud.define('feedPet', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	console.log('[feedPet] Info=\'Running cloud code\' petId=' + req.params.petId + ' fedBy=' + req.params.fedBy + ' fedAt=' + req.params.fedAt);
@@ -98,18 +96,7 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 
 
 Parse.Cloud.define('manageFeeders', function(req, res) {
-	function arrayContains(a, obj) {
-		console.log('contains');
-		/*var i = a.length;
-		console.log('length=' + i);
-		while (i--) {
-			console.log('i=' + i);
-			if (a[i] === obj) {
-			   return true;
-			}
-		}
-		return false;*/
-	}
+	var utility = require(utility.js);
 
 	Parse.Cloud.useMasterKey();
 	console.log('[manageFeeders] Info=\'Running cloud code\' petId=' + req.params.petId + ' userId=' + req.params.userId);
@@ -146,8 +133,8 @@ Parse.Cloud.define('manageFeeders', function(req, res) {
 			console.log('length=' + i);
 			while (i--) {
 				console.log('i=' + i);
-				arrayContains(mFeeders,friend);
-				if(arrayContains(mFeeders, friend)){
+				utility.contains(mFeeders,friend);
+				if(utility.contains(mFeeders, friend)){
 					friend.isFeeder = true;
 				}
 			}

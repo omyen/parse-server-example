@@ -99,7 +99,8 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 
 Parse.Cloud.define('manageFeeders', function(req, res) {
 	function contains(a, obj) {
-		var i = a.length;
+		console.log('contains');
+		/*var i = a.length;
 		console.log('length=' + i);
 		while (i--) {
 			console.log('i=' + i);
@@ -107,7 +108,7 @@ Parse.Cloud.define('manageFeeders', function(req, res) {
 			   return true;
 			}
 		}
-		return false;
+		return false;*/
 	}
 
 	Parse.Cloud.useMasterKey();

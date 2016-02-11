@@ -125,7 +125,7 @@ Parse.Cloud.define('manageFeeders', function(req, res) {
 			console.log('[manageFeeders] Info=\'Found user from ID\' username=' + user.get('username'));
 			mUser = user;
 			var queryFriends = user.relation('friends').query();
-			return queryFriends.run();
+			return queryFriends.find();
 		}).then(function(friends){
 			console.log('[manageFeeders] Info=\'Retrieved friends successfully\' numberRetrieved=' + friends.length);
 			mFriends= friends;
@@ -134,7 +134,7 @@ Parse.Cloud.define('manageFeeders', function(req, res) {
 			console.log('[feedPet] Info=\'Found pet from ID\' name=' + pet.get('name'));
 			mPet = pet;
 			var queryFeeders = pet.relation('users').query();
-			return queryFeeders.run();
+			return queryFeeders.find();
 		}).then(function(feeders){
 			console.log('[manageFeeders] Info=\'Retrieved feeders successfully\' numberRetrieved=' + feeders.length);
 			mFriends.forEach(function(friend) {

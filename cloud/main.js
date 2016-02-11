@@ -138,7 +138,7 @@ Parse.Cloud.define('manageFeeders', function(req, res) {
 		}).then(function(feeders){
 			console.log('[manageFeeders] Info=\'Retrieved feeders successfully\' numberRetrieved=' + feeders.length);
 			mFriends.forEach(function(friend) {
-				if(contains(mFeeders, friend){
+				if(contains(mFeeders, friend)){
 					friend.isFeeder = true;
 				}
 			});

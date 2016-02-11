@@ -1,15 +1,5 @@
 
-function contains(a, obj) {
-    var i = a.length;
-	console.log('length=' + i);
-    while (i--) {
-		console.log('i=' + i);
-		if (a[i] === obj) {
-		   return true;
-		}
-    }
-    return false;
-}
+
 
 
 Parse.Cloud.define('feedPet', function(req, res) {
@@ -108,6 +98,18 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 
 
 Parse.Cloud.define('manageFeeders', function(req, res) {
+	function contains(a, obj) {
+		var i = a.length;
+		console.log('length=' + i);
+		while (i--) {
+			console.log('i=' + i);
+			if (a[i] === obj) {
+			   return true;
+			}
+		}
+		return false;
+	}
+
 	Parse.Cloud.useMasterKey();
 	console.log('[manageFeeders] Info=\'Running cloud code\' petId=' + req.params.petId + ' userId=' + req.params.userId);
 	

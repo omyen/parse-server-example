@@ -1,10 +1,12 @@
 
 function contains(a, obj) {
     var i = a.length;
+	console.log('length=' + i);
     while (i--) {
-       if (a[i] === obj) {
-           return true;
-       }
+		console.log('i=' + i);
+		if (a[i] === obj) {
+		   return true;
+		}
     }
     return false;
 }

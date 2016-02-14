@@ -113,33 +113,37 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 	queryPet.get(req.params.petId).then(function(pet) {
 			console.log('[setFeedersChanges] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
-			var toSave = [];
-			//TODO work out how to turn this into a promise.all
-			var waitFor = req.params.changeList.length; //hacky hack. only return once all the users have been pushed on
+
+			var promises = [];
+
 			req.params.changeList.forEach(function(change){
 				var User = Parse.Object.extend('_User');
 				var queryUser = new Parse.Query(User);
 
 				console.log('[setFeedersChanges] Info=\'Finding user from id\' id=' + change.id);
-				queryUser.get(change.id).then(function(user) {
-					console.log('[setFeedersChanges] Info=\'Found user from ID\' username=' + user.get('username'));
-					relationPets = user.relation('friendPets');
-					if(change.isFeeder){
-						console.log('[setFeedersChanges] Info=\'Adding pet to list\'');
-						relationPets.add(mPet);
-					} else {
-						console.log('[setFeedersChanges] Info=\'Removing pet from list\'');
-						relationPets.remove(mPet);
-					}
-					toSave.push(user);
-					waitFor--;
-				}, function(error){
-					console.log('[setFeedersChanges] Info=\'Error finding user\' error=' + error.message);
-					res.error(error.message);
-				}); 
+				promises.push(queryUser.get(change.id));
 			});
 			
-			while(waitFor) {}; //wait for all the user to be pushed on
+
+			return Parse.Promise.when(promises);
+		}).then(function(results){
+			console.log('[setFeedersChanges] Info=\'Found users from ID\' numUsers=' + results.length);
+			var toSave = [];
+			
+			var index = 0;
+			//this assumes the lists are in the same order... dangerous?
+			results.forEach(function(user){
+				relationPets = user.relation('friendPets');
+				if(req.params.changeList[index].isFeeder){
+					console.log('[setFeedersChanges] Info=\'Adding pet to list\'');
+					relationPets.add(mPet);
+				} else {
+					console.log('[setFeedersChanges] Info=\'Removing pet from list\'');
+					relationPets.remove(mPet);
+				}
+				toSave.push(user);
+				i++;
+			});
 			return Parse.Object.saveAll(toSave);
 		}).then(function(results){
 			console.log('[setFeedersChanges] Info=\'Saved all users\'');
@@ -149,5 +153,4 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 			res.error(error.message);
 		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
 });
-
 

@@ -114,11 +114,13 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 
 				
 				queryUser.get(change.id).then(function(user) {
-					console.log('[setFeedersChanges] Info=\'Found user from ID\'');
+					console.log('[setFeedersChanges] Info=\'Found user from ID\' username=' + user.get('username'));
 					relationPets = user.relation('friendPets');
 					if(change.isFeeder){
+						console.log('[setFeedersChanges] Info=\'Adding pet to list\'')
 						relationPets.add(mPet);
 					} else {
+						console.log('[setFeedersChanges] Info=\'Removing pet from list\'')
 						relationPets.remove(mPet);
 					}
 					user.save(); //don't handle errors

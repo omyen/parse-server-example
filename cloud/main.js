@@ -77,7 +77,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
 		return mRequested.save();
 	}).then(function(requested) {
 		res.success('OK');
-	}), function(error) {
+	}, function(error) {
 		console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
 		res.error(error.message);
 	}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
@@ -116,6 +116,8 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 			console.log('[setFeedersChanges] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
 			var toSave = [];
+			//TODO work out how to turn this into a promise.all
+			var waitFor = req.params.changeList.length; //hacky hack. only return once all the users have been pushed on
 			req.params.changeList.forEach(function(change){
 				var User = Parse.Object.extend('_User');
 				var queryUser = new Parse.Query(User);
@@ -132,13 +134,16 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 						relationPets.remove(mPet);
 					}
 					toSave.push(user);
+					waitFor--;
 				}); 
 			});
+			
+			while(waitFor) {}; //wait for all the user to be pushed on
 			return Parse.Object.saveAll(toSave);
 		}).then(function(results){
 			console.log('[setFeedersChanges] Info=\'Saved all users\'');
 			res.success('OK');
-		}), function(error) {
+		}, function(error) {
 			console.log('[setFeedersChanges] Info=\'setFeedersChanges failed\' error=' + error.message);
 			res.error(error.message);
 		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!

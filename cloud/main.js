@@ -133,6 +133,9 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 					}
 					toSave.push(user);
 					waitFor--;
+				}, function(error){
+					console.log('[setFeedersChanges] Info=\'Error finding user\' error=' + error.message);
+					res.error(error.message);
 				}); 
 			});
 			

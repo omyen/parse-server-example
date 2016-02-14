@@ -72,7 +72,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
 		requested.relation('friends').add(mRequester);
 		return requested.save();
 	}).then(function(requested) {
-		return mRequested.save();
+		return mRequester.save();
 	}).then(function(requested) {
 		res.success('OK');
 	}, function(error) {
@@ -100,6 +100,7 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 });
 
 Parse.Cloud.define('setFeedersChanges', function(req, res) {
+	//holy shit maybe this whole thing should be a join table
 	Parse.Cloud.useMasterKey();
 	console.log('[setFeedersChanges] Info=\'Running cloud code\' petId=' + req.params.petId + ' changeList=' + req.params.changeList);
 	

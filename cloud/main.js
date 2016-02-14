@@ -41,8 +41,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	console.log('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
 
-	//want a response that we set this immediately to confirm for the user - so let's reply as soon as we've set off the all the queries at once
-	//don't handle errors
+
 
 	//delete the request
 	var FriendRequest = Parse.Object.extend('FriendRequest');
@@ -73,11 +72,19 @@ Parse.Cloud.define('addFriend', function(req, res) {
 		requested.relation('friends').add(mRequester);
 		
 		mRequester.save();
-		requested.save();
-	});
+		return requested.save();
+	}).then(function(requested) {
+		return mRequested.save();
+	}).then(function(requested) {
+		res.success('OK');
+	}), function(error) {
+		console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
+		res.error(error.message);
+	}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
+
 	
 	
-	res.success('OK');
+	
 });
 
 Parse.Cloud.define('searchFriend', function(req, res) {
@@ -108,6 +115,7 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 	queryPet.get(req.params.petId).then(function(pet) {
 			console.log('[setFeedersChanges] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
+			var toSave = [];
 			req.params.changeList.forEach(function(change){
 				var User = Parse.Object.extend('_User');
 				var queryUser = new Parse.Query(User);
@@ -117,15 +125,18 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 					console.log('[setFeedersChanges] Info=\'Found user from ID\' username=' + user.get('username'));
 					relationPets = user.relation('friendPets');
 					if(change.isFeeder){
-						console.log('[setFeedersChanges] Info=\'Adding pet to list\'')
+						console.log('[setFeedersChanges] Info=\'Adding pet to list\'');
 						relationPets.add(mPet);
 					} else {
-						console.log('[setFeedersChanges] Info=\'Removing pet from list\'')
+						console.log('[setFeedersChanges] Info=\'Removing pet from list\'');
 						relationPets.remove(mPet);
 					}
-					user.save(); //don't handle errors
-				}); //don't handle errors
+					toSave.push(user);
+				}); 
 			});
+			return Parse.Object.saveAll(toSave);
+		}.then(function(results){
+			console.log('[setFeedersChanges] Info=\'Saved all users\'');
 			res.success('OK');
 		}, function(error) {
 			console.log('[setFeedersChanges] Info=\'setFeedersChanges failed\' error=' + error.message);

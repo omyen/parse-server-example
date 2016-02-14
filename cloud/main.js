@@ -124,6 +124,7 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 					user.save(); //don't handle errors
 				}); //don't handle errors
 			});
+			res.success('OK');
 		}, function(error) {
 			console.log('[setFeedersChanges] Info=\'setFeedersChanges failed\' error=' + error.message);
 			res.error(error.message);

@@ -94,4 +94,40 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 		});	  
 });
 
+Parse.Cloud.define('setFeedersChanges', function(req, res) {
+	Parse.Cloud.useMasterKey();
+	console.log('[setFeedersChanges] Info=\'Running cloud code\' petId=' + req.params.petId + ' changeList=' + req.params.changeList);
+	
+	
+	var Pet = Parse.Object.extend('Pet');
+	var queryPet = new Parse.Query(Pet);
+	
+	var mPet;
+
+	//user doesn't wait on this, so we can do it all sequentially
+	queryPet.get(req.params.petId).then(function(pet) {
+			console.log('[setFeedersChanges] Info=\'Found pet from ID\' petname=' + pet.get('name'));
+			mPet = pet;
+			req.params.changeList.forEach(function(change){
+				var User = Parse.Object.extend('_User');
+				var queryUser = new Parse.Query(User);
+
+				
+				queryUser.get(change.id).then(function(user) {
+					console.log('[setFeedersChanges] Info=\'Found user from ID\'');
+					relationPets = user.relation('friendPets');
+					if(change.isFeeder){
+						relationPets.add(mPet);
+					} else {
+						relationPets.remove(mPet);
+					}
+					user.save(); //don't handle errors
+				}); //don't handle errors
+			});
+		}, function(error) {
+			console.log('[setFeedersChanges] Info=\'setFeedersChanges failed\' error=' + error.message);
+			res.error(error.message);
+		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
+});
+
 

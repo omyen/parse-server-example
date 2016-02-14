@@ -142,7 +142,7 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 					relationPets.remove(mPet);
 				}
 				toSave.push(user);
-				i++;
+				index++;
 			});
 			return Parse.Object.saveAll(toSave);
 		}).then(function(results){

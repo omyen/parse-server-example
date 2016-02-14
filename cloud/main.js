@@ -120,7 +120,7 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 				var User = Parse.Object.extend('_User');
 				var queryUser = new Parse.Query(User);
 
-				console.log('[setFeedersChanges] Info=\'Finding user from id\'');
+				console.log('[setFeedersChanges] Info=\'Finding user from id\' id=' + change.id);
 				queryUser.get(change.id).then(function(user) {
 					console.log('[setFeedersChanges] Info=\'Found user from ID\' username=' + user.get('username'));
 					relationPets = user.relation('friendPets');

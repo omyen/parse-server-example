@@ -138,7 +138,7 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 		}).then(function(results){
 			console.log('[setFeedersChanges] Info=\'Saved all users\'');
 			res.success('OK');
-		}, function(error) {
+		}), function(error) {
 			console.log('[setFeedersChanges] Info=\'setFeedersChanges failed\' error=' + error.message);
 			res.error(error.message);
 		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!

@@ -135,7 +135,7 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 				}); 
 			});
 			return Parse.Object.saveAll(toSave);
-		}.then(function(results){
+		}).then(function(results){
 			console.log('[setFeedersChanges] Info=\'Saved all users\'');
 			res.success('OK');
 		}, function(error) {

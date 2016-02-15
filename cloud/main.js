@@ -1,4 +1,9 @@
-
+Parse.Cloud.beforeSave(Parse.User, function(request, response) {
+	if (!request.object.existed()) {
+		request.object.setACL(new Parse.ACL(request.object));
+		response.success();  
+	}
+});
 
 Parse.Cloud.define('feedPet', function(req, res) {
 	Parse.Cloud.useMasterKey();

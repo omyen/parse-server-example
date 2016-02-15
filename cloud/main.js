@@ -71,9 +71,11 @@ Parse.Cloud.define('addFriend', function(req, res) {
 		mRequester.relation('friends').add(requested);
 		requested.relation('friends').add(mRequester);
 		return requested.save();
-	}).then(function(requested) {
+	}).then(function(result) {
+		console.log('[addFriend] Info=\'Saved requested\' requestedName=' + result.get('username'));
 		return mRequester.save();
-	}).then(function(requested) {
+	}).then(function(result) {
+		console.log('[addFriend] Info=\'Saved requester\' requesterName=' + result.get('username'));
 		res.success('OK');
 	}, function(error) {
 		console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);

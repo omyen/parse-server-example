@@ -2,7 +2,7 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
 	//TODO make a class for private data and link it
 	//if (!request.object.existed()) {
 		//request.object.setACL(new Parse.ACL(request.object));
-		//response.success();  
+		response.success();  
 	//}
 });
 

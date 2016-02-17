@@ -50,12 +50,13 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	console.log('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
 
 	var FriendRequest = Parse.Object.extend('FriendRequest');
+	var User = Parse.Object.extend('_User');
+	
+	
 	var friendRequest = new FriendRequest;
 	friendRequest.id = req.params.requestId;
 	friendRequest.destroy();
 
-	var User = Parse.Object.extend('_User');
-	
 	var requester = new User;
 	requester.id = req.params.requesterId;
 	
@@ -75,46 +76,6 @@ Parse.Cloud.define('addFriend', function(req, res) {
 		console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
 		res.error(error.message);
 	}); 
-	/*
-	//delete the request
-	var FriendRequest = Parse.Object.extend('FriendRequest');
-	var queryRequest = new Parse.Query(FriendRequest);
-	
-	queryRequest.get(req.params.requestId).then(function(friendRequest) {
-		console.log('[addFriend] Info=\'Found friendRequest from ID, deleting\'');
-		friendRequest.destroy();
-	})
-			
-	//add the friend to both users
-	var User = Parse.Object.extend('_User');
-	var queryRequester = new Parse.Query(User);
-	var queryRequested = new Parse.Query(User);
-	
-	var mRequester;
-	
-	
-	queryRequester.get(req.params.requesterId).then(function(requester) {
-		console.log('[addFriend] Info=\'Found requester from ID\'');
-		mRequester= requester;
-		return queryRequested.get(req.params.requestedId);
-	}).then(function(requested) {
-		console.log('[addFriend] Info=\'Found requested from ID\'');
-		mRequester.relation('friends').add(requested);
-		requested.relation('friends').add(mRequester);
-		return requested.save();
-	}).then(function(result) {
-		console.log('[addFriend] Info=\'Saved requested\' requestedName=' + result.get('username'));
-		return mRequester.save();
-	}).then(function(result) {
-		console.log('[addFriend] Info=\'Saved requester\' requesterName=' + result.get('username'));
-		res.success('OK');
-	}, function(error) {
-		console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
-		res.error(error.message);
-	}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
-	*/
-	
-	
 	
 });
 
@@ -133,11 +94,48 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 });
 
 Parse.Cloud.define('setFeedersChanges', function(req, res) {
-	//holy shit maybe this whole thing should be a join table
 	Parse.Cloud.useMasterKey();
 	console.log('[setFeedersChanges] Info=\'Running cloud code\' petId=' + req.params.petId + ' changeList=' + req.params.changeList);
 	
+	var Pet = Parse.Object.extend('Pet');
+	var User = Parse.Object.extend('_User');
 	
+	var pet = new Pet;
+	pet.id = req.params.petId;
+	pet.set('name', req.params.name);
+	pet.set('feedsPerDay', req.params.feedsPerDay);
+	var relationFriends = pet.relation('feeders');
+	
+	var toSave = [pet];
+	
+	req.params.changeList.forEach(function(change){
+		var user = new User;
+		user.id = change.id;
+		
+		relationPets = user.relation('friendPets');
+		if(change.isFeeder){
+			console.log('[setFeedersChanges] Info=\'Adding pet to list\'');
+			relationPets.add(pet);
+			relationFriends.add(user);
+		} else {
+			console.log('[setFeedersChanges] Info=\'Removing pet from list\'');
+			relationPets.remove(pet);
+			relationFriends.remove(user);
+		}
+
+		toSave.push(user);
+	});
+	
+	
+	Parse.Object.saveAll(toSave).then(function(result) {
+		console.log('[addFriend] Info=\'setFeedersChanges complete\'');
+		res.success('OK');
+	}, function(error) {
+		console.log('[addFriend] Info=\'setFeedersChanges failed\' error=' + error.message);
+		res.error(error.message);
+	}); 
+	
+	/*
 	var Pet = Parse.Object.extend('Pet');
 	var queryPet = new Parse.Query(Pet);
 	
@@ -186,5 +184,7 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 			console.log('[setFeedersChanges] Info=\'setFeedersChanges failed\' error=' + error.message);
 			res.error(error.message);
 		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
+		
+		*/
 });
 

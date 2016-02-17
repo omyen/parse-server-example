@@ -49,8 +49,33 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	console.log('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
 
+	var FriendRequest = Parse.Object.extend('FriendRequest');
+	var friendRequest = new FriendRequest;
+	friendRequest.id = req.params.requestId;
+	friendRequest.destroy();
 
-
+	var User = Parse.Object.extend('_User');
+	
+	var requester = new User;
+	requester.id = req.params.requesterId;
+	
+	var requested = new User;
+	requested.id = req.params.requestedId;
+	
+	
+	requester.relation('friends').add(requested);
+	requested.relation('friends').add(requester);
+	
+	var toSave = [requester,requested];
+	
+	Parse.Object.saveAll(toSave).then(function(result) {
+		console.log('[addFriend] Info=\'addFriend complete\'');
+		res.success('OK');
+	}, function(error) {
+		console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
+		res.error(error.message);
+	}); 
+	/*
 	//delete the request
 	var FriendRequest = Parse.Object.extend('FriendRequest');
 	var queryRequest = new Parse.Query(FriendRequest);
@@ -61,8 +86,6 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	})
 			
 	//add the friend to both users
-	
-	//delete the request
 	var User = Parse.Object.extend('_User');
 	var queryRequester = new Parse.Query(User);
 	var queryRequested = new Parse.Query(User);
@@ -89,7 +112,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
 		console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
 		res.error(error.message);
 	}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
-
+	*/
 	
 	
 	

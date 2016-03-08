@@ -1,9 +1,48 @@
-Parse.Cloud.beforeSave(Parse.User, function(request, response) {
-	//TODO make a class for private data and link it
-	//if (!request.object.existed()) {
-		//request.object.setACL(new Parse.ACL(request.object));
-		response.success();  
-	//}
+Parse.Cloud.define('signUp', function(req, res) {
+	//Parse.Cloud.useMasterKey();
+	//ok to get password in the clear since we are running over https
+	console.log('[signUp] Info=\'Running cloud code\' username=' + req.params.username + ' password=' + req.params.password + ' email=' + req.params.email);
+
+	//email is private data
+	var PrivateData = Parse.Object.extend('PrivateData');
+	var privateData = new PrivateData();
+	privateData.set('email', req.params.email);
+
+	var User = Parse.Object.extend('_User');
+	var user = new User();
+	user.set('username', req.params.username);
+	user.set('username_lowercase', req.params.username.toLowerCase()); //for searching
+	user.set('password', req.params.password);
+
+	user.signUp().then(
+		function(user) {
+			console.log('[signup] Info=\'Signup successful\' username=' + user.get('username') + ' password=' + user.get('password'));
+			
+			var acl = new Parse.ACL();
+			acl.setPublicReadAccess(false);
+			acl.setWriteAccess(user, true);
+			privateData.setACL(acl);
+
+			return privateData.save();
+		}).then(
+		function(privateData) {
+			console.log('[signup] Info=\'Saved privateData\'');
+			user.set('privateData', privateData);
+
+			var acl = new Parse.ACL();
+			acl.setPublicReadAccess(true);
+			acl.setWriteAccess(user, true);
+			user.setACL(user);
+
+			return user.save();
+		}).then(
+		function(user) {
+			console.log('[signup] Info=\'Saved user\'');
+			res.success(user);
+		}, function(error) {
+			console.log('[signup] Info=\'Signup failed\' error=' + error.message);
+			res.error(error.message);
+		});
 });
 
 Parse.Cloud.define('feedPet', function(req, res) {
@@ -24,7 +63,8 @@ Parse.Cloud.define('feedPet', function(req, res) {
 	var mPet;
 
 	//user doesn't wait on this, so we can do it all sequentially
-	queryPet.get(req.params.petId).then(function(pet) {
+	queryPet.get(req.params.petId).then(
+		function(pet) {
 			console.log('[feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
 			mPet.set('lastFed', req.params.fedAt);
@@ -69,13 +109,14 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	
 	var toSave = [requester,requested];
 	
-	Parse.Object.saveAll(toSave).then(function(result) {
-		console.log('[addFriend] Info=\'addFriend complete\'');
-		res.success('OK');
-	}, function(error) {
-		console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
-		res.error(error.message);
-	}); 
+	Parse.Object.saveAll(toSave).then(
+		function(result) {
+			console.log('[addFriend] Info=\'addFriend complete\'');
+			res.success('OK');
+		}, function(error) {
+			console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
+			res.error(error.message);
+		}); 
 	
 });
 

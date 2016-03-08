@@ -17,7 +17,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	user.signUp().then(
 		function(user) {
 			console.log('[signup] Info=\'Signup successful\' username=' + user.get('username') + ' password=' + user.get('password'));
-			
+
 			var acl = new Parse.ACL();
 			acl.setPublicReadAccess(false);
 			acl.setWriteAccess(user, true);
@@ -34,7 +34,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 			acl.setWriteAccess(user, true);
 			user.setACL(user);
 
-			return user.save();
+			return user.save(null, {useMasterKey:true});
 		}).then(
 		function(user) {
 			console.log('[signup] Info=\'Saved user\'');

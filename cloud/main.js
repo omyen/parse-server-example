@@ -32,7 +32,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 			var acl = new Parse.ACL();
 			acl.setPublicReadAccess(true);
 			acl.setWriteAccess(user, true);
-			user.setACL(user);
+			user.setACL(acl);
 
 			return user.save(null, {useMasterKey:true});
 		}).then(

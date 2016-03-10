@@ -192,12 +192,10 @@ Parse.Cloud.define('getPosts', function(req, res) {
 	queryPosts.skip(req.params.startPost);
 
 	queryPosts.find().then(function(results){
-			console.log(TAG + ' [getPosts] Info=\'Retrieving posts succeeded\' numberRetreived=' + results.length);
 			res.success(results);
 		}, function(error){
-			console.log(TAG + ' [getPosts] Info=\'Retrieving posts failed\' error=' + error.message);
 			res.error(error.message);
-		});
+		});	  
 	
 });
 

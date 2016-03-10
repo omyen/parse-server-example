@@ -175,57 +175,29 @@ Parse.Cloud.define('setFeedersChanges', function(req, res) {
 		console.log('[addFriend] Info=\'setFeedersChanges failed\' error=' + error.message);
 		res.error(error.message);
 	}); 
+});
+
+
+Parse.Cloud.define('getPosts', function(req, res) {
+	Parse.Cloud.useMasterKey();
+	console.log('[getPosts] Info=\'Running cloud code\' userId=' + req.params.userId + ' startPost=' + req.params.startPost + ' numPosts=' + req.params.numPosts);
 	
-	/*
-	var Pet = Parse.Object.extend('Pet');
-	var queryPet = new Parse.Query(Pet);
 	
-	var mPet;
+	var User = Parse.Object.extend('_User');
+	var user = new User;
+	user.id = req.params.userId;
+	
+	var queryPosts = user.relation('posts').query();
+	queryPosts.limit(req.params.numPosts);
+	queryPosts.skip(req.params.userId);
 
-	//user doesn't wait on this, so we can do it all sequentially
-	queryPet.get(req.params.petId).then(function(pet) {
-			console.log('[setFeedersChanges] Info=\'Found pet from ID\' petname=' + pet.get('name'));
-			mPet = pet;
-
-			var promises = [];
-
-			req.params.changeList.forEach(function(change){
-				var User = Parse.Object.extend('_User');
-				var queryUser = new Parse.Query(User);
-
-				console.log('[setFeedersChanges] Info=\'Finding user from id\' id=' + change.id);
-				promises.push(queryUser.get(change.id));
-			});
-			
-
-			return Parse.Promise.when(promises);
-		}).then(function(results){
-			console.log('[setFeedersChanges] Info=\'Found users from ID\' numUsers=' + results.length);
-			var toSave = [];
-			
-			var index = 0;
-			//this assumes the lists are in the same order... dangerous?
-			results.forEach(function(user){
-				relationPets = user.relation('friendPets');
-				if(req.params.changeList[index].isFeeder){
-					console.log('[setFeedersChanges] Info=\'Adding pet to list\'');
-					relationPets.add(mPet);
-				} else {
-					console.log('[setFeedersChanges] Info=\'Removing pet from list\'');
-					relationPets.remove(mPet);
-				}
-				toSave.push(user);
-				index++;
-			});
-			return Parse.Object.saveAll(toSave);
-		}).then(function(results){
-			console.log('[setFeedersChanges] Info=\'Saved all users\'');
-			res.success('OK');
-		}, function(error) {
-			console.log('[setFeedersChanges] Info=\'setFeedersChanges failed\' error=' + error.message);
+	queryPosts.find().then(function(results){
+			console.log(TAG + ' [getPosts] Info=\'Retrieving posts succeeded\' numberRetreived=' + results.length);
+			res.success(results);
+		}, function(error){
+			console.log(TAG + ' [getPosts] Info=\'Retrieving posts failed\' error=' + error.message);
 			res.error(error.message);
-		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
-		
-		*/
+		});
+	
 });
 

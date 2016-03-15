@@ -134,17 +134,15 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 		});	  
 });
 
-Parse.Cloud.define('setFeedersChanges', function(req, res) {
+Parse.Cloud.define('setOwnersChanges', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	console.log('[setFeedersChanges] Info=\'Running cloud code\' petId=' + req.params.petId + ' changeList=' + req.params.changeList);
+	console.log('[setOwnersChanges] Info=\'Running cloud code\' petId=' + req.params.petId + ' changeList=' + req.params.changeList);
 	
 	var Pet = Parse.Object.extend('Pet');
 	var User = Parse.Object.extend('_User');
 	
 	var pet = new Pet;
 	pet.id = req.params.petId;
-	pet.set('name', req.params.name);
-	pet.set('feedsPerDay', req.params.feedsPerDay);
 	var relationFriends = pet.relation('feeders');
 	
 	var toSave = [pet];

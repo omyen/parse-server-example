@@ -143,7 +143,7 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 	
 	var pet = new Pet;
 	pet.id = req.params.petId;
-	var relationFriends = pet.relation('feeders');
+	var relationFriends = pet.relation('owners');
 	
 	var toSave = [pet];
 	

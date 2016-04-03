@@ -1,3 +1,18 @@
+Parse.Cloud.define('checkPassword', function(request, response) 
+{
+    var password = request.params.password;
+
+    Parse.User.logIn(request.user.getUsername(), password, {
+        success: function(results) 
+        {   
+            response.success(true);
+        },
+        error: function() {
+            response.success(false);
+        }
+    });
+});
+
 Parse.Cloud.define('signUp', function(req, res) {
 	//Parse.Cloud.useMasterKey();
 	//ok to get password in the clear since we are running over https

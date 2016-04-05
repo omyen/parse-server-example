@@ -5,8 +5,13 @@ Parse.serverURL = process.env.SERVER_URL;
 var RETRIES = 5;
 
 function propagatePost(post){
-	
-	return true;
+	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
+
+	Parse.Object.saveAll(toSave).then(function(result) {
+		return true;
+	}, function(error) {
+		return false;
+	}); 
 }
 
 function publishFedPet(feedingLog){

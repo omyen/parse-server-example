@@ -2,7 +2,7 @@ var Parse = require('parse/node');
 Parse.initialize(process.env.APP_ID, '', process.env.MASTER_KEY); //middle var is js key - null
 Parse.serverURL = process.env.SERVER_URL;
 
-var RETRIES = 5;
+var RETRIES = 2;
 
 function propagatePost(post){
 	Parse.Cloud.useMasterKey();
@@ -10,7 +10,7 @@ function propagatePost(post){
 	post.get('causingUser').relation('posts').add(post);
 
 	Parse.Object.saveAll(toSave).then(function(result) {
-		console.log('[publishFedPet] Info=\'OK\'');
+		console.log('[propagatePost] Info=\'OK\'');
 		return true;
 	}, function(error) {
 		console.log('[propagatePost] Info=\'Error\' error=' + error.message);
@@ -72,6 +72,7 @@ function processPublishQueue(){
 				case 'fedPet':
 					//if success, destroy the item
 					if(publishFedPet(queueItem.get('savedObject'))){
+						console.log('[processPublishQueue] Info=\'Destroying queueItem\' type=' + queueItem.get('type'));
 						queueItem.destroy();
 					}
 					break;

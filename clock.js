@@ -15,7 +15,7 @@ function propagatePost(post){
 }
 
 function publishFedPet(feedingLog){
-	console.log('[publishFedPet] Info=\'Processing object\' + userId=' + feedingLog.get('fedBy').objectId);
+	console.log('[publishFedPet] Info=\'Processing object\' + userId=' + feedingLog.get('fedBy').get('objectId'));
 	// if(feedingLog.className != 'FeedingLog'){
 	// 	//unrecoverable, delete immediately
 	// 	console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);

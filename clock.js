@@ -26,14 +26,14 @@ function publishFedPet(feedingLog){
 	var post = new Post();
 	post.set('type', 'fedPet');
 
-	var queryUser = new Parse.Query('_User');
-	queryUser.get(feedingLog.fedBy.id).then(function(user) {
+	//var queryUser = new Parse.Query('_User');
+	queryUser.get(feedingLog.get('fedBy').id).then(function(user) {
 		console.log('[publishFedPet] Info=\'Retrieved user\'');
 		post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
 		post.set('causingUser', user);
 		
 		var queryPet = new Parse.Query('Pet');
-		return queryPet.get(feedingLog.petFed.id);
+		return queryPet.get(feedingLog.get('petFed').id);
 	}).then(function(pet){
 		console.log('[publishFedPet] Info=\'Retrieved pet\'');
 		post.set('aboutPet', pet);

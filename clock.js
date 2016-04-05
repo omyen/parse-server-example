@@ -9,50 +9,38 @@ function propagatePost(post){
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
 	post.get('causingUser').relation('posts').add(post);
 
-	
-	return new Promise(function(fulfill, reject){
-		Parse.Object.saveAll(toSave).then(function(result) {
-			console.log('[propagatePost] Info=\'OK\'');
-			fulfil(result);
-		}, function(error) {
-			console.log('[propagatePost] Info=\'Error\' error=' + error.message);
-			reject(error.message);
-		}); 
-	});
+	return Parse.Object.saveAll(toSave);
 }
 
 function publishFedPet(feedingLog){
 	console.log('[publishFedPet] Info=\'Processing object\' + fedBy=' + feedingLog.get('fedBy'));
-	if(feedingLog.className != 'FeedingLog'){
-		//unrecoverable, delete immediately
-		console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);
-		return true;
-	}
+	// if(feedingLog.className != 'FeedingLog'){
+	// 	//unrecoverable, delete immediately
+	// 	console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);
+	// 	return true;
+	// }
 
 	var Post = Parse.Object.extend('Post');
 	var post = new Post();
 	post.set('type', 'fedPet');
 
-	return new Promise(function(fulfill, reject){
-		feedingLog.get('fedBy').fetch().then(function(user) {
-			console.log('[publishFedPet] Info=\'Retrieved user\'');
-			post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
-			post.set('causingUser', user);
-			
-			return feedingLog.get('petFed').fetch();
-		}).then(function(pet){
-			console.log('[publishFedPet] Info=\'Retrieved pet\'');
-			post.set('aboutPet', pet);
-			post.set('image', pet.get('profilePhoto'));
-			return post.save();
-		}).then(function(post){
-			console.log('[publishFedPet] Info=\'Saved post\'');
-			fulfil(propagatePost(post));
-		}, function(error) {
-			console.log('[publishFedPet] Info=\'Error\' error=' + error.message);
-			reject(error.message);
-		});
+
+	return feedingLog.get('fedBy').fetch().then(function(user) {
+		console.log('[publishFedPet] Info=\'Retrieved user\'');
+		post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
+		post.set('causingUser', user);
+		
+		return feedingLog.get('petFed').fetch();
+	}).then(function(pet){
+		console.log('[publishFedPet] Info=\'Retrieved pet\'');
+		post.set('aboutPet', pet);
+		post.set('image', pet.get('profilePhoto'));
+		return post.save();
+	}).then(function(post){
+		console.log('[publishFedPet] Info=\'Saved post\'');
+		return propagatePost(post);
 	});
+
 }
 
 

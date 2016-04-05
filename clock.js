@@ -5,6 +5,7 @@ Parse.serverURL = process.env.SERVER_URL;
 var RETRIES = 5;
 
 function propagatePost(post){
+	Parse.Cloud.useMasterKey();
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
 	post.get('causingUser').relation('posts').add(post);
 

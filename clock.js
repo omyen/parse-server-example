@@ -54,8 +54,10 @@ function processPublishQueue(){
 
 	query.find().then(function(publishQueue){
 		publishQueue.forEach(function(queueItem){
-
-			if(queueItem.get('retries')>RETRIES){
+			if(queueItem.get('retries') == null){
+				queueItem.set('retries', 0);
+				queueItem.save();
+			}else if(queueItem.get('retries')>RETRIES){
 				queueItem.destroy();
 			} else {
 				queueItem.set('retries', queueItem.get('retries') + 1);

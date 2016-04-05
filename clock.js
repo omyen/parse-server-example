@@ -47,10 +47,10 @@ function publishFedPet(feedingLog){
 			return post.save();
 		}).then(function(post){
 			console.log('[publishFedPet] Info=\'Saved post\'');
-			return propagatePost(post);
+			fulfil(propagatePost(post));
 		}, function(error) {
 			console.log('[publishFedPet] Info=\'Error\' error=' + error.message);
-			return reject(error.message);
+			reject(error.message);
 		});
 	});
 }

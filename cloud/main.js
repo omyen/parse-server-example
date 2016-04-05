@@ -1,3 +1,8 @@
+Parse.Cloud.afterSave('Pet', function(req) 
+{
+    
+});
+
 Parse.Cloud.define('checkPassword', function(request, response) 
 {
     var password = request.params.password;

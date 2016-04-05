@@ -71,6 +71,7 @@ function processPublishQueue(){
 			switch(queueItem.get('type')){
 				case 'fedPet':
 					//if success, destroy the item
+					console.log('[processPublishQueue] Info=\'Result\' ' + publishFedPet(queueItem.get('savedObject')));
 					if(publishFedPet(queueItem.get('savedObject'))){
 						console.log('[processPublishQueue] Info=\'Destroying queueItem\' type=' + queueItem.get('type'));
 						queueItem.destroy();

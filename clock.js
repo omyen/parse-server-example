@@ -26,18 +26,22 @@ function publishFedPet(feedingLog){
 
 	var queryUser = new Parse.Query('_User');
 	queryUser.get(feedingLog.fedBy.get('objectId')).then(function(user) {
+		console.log('[publishFedPet] Info=\'Retrieved user\'');
 		post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
 		post.set('causingUser', user);
 		
 		var queryPet = new Parse.Query('Pet');
 		return queryPet.get(feedingLog.petFed.get('objectId'));
 	}).then(function(pet){
+		console.log('[publishFedPet] Info=\'Retrieved pet\'');
 		post.set('aboutPet', pet);
 		post.set('image', pet.get('profilePhoto'));
 		return post.save();
 	}).then(function(post){
+		console.log('[publishFedPet] Info=\'Saved post\'');
 		return propagatePost(post);
 	}, function(error) {
+		console.log('[publishFedPet] Info=\'Error\' error=' + error.message);
 		return false;
 	});
 }

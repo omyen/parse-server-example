@@ -9,13 +9,16 @@ function propagatePost(post){
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
 	post.get('causingUser').relation('posts').add(post);
 
-	Parse.Object.saveAll(toSave).then(function(result) {
-		console.log('[propagatePost] Info=\'OK\'');
-		return true;
-	}, function(error) {
-		console.log('[propagatePost] Info=\'Error\' error=' + error.message);
-		return false;
-	}); 
+	
+	return new Promise(function(fulfill, reject){
+		Parse.Object.saveAll(toSave).then(function(result) {
+			console.log('[propagatePost] Info=\'OK\'');
+			fulfil(result);
+		}, function(error) {
+			console.log('[propagatePost] Info=\'Error\' error=' + error.message);
+			reject(error.message);
+		}); 
+	});
 }
 
 function publishFedPet(feedingLog){
@@ -30,27 +33,25 @@ function publishFedPet(feedingLog){
 	var post = new Post();
 	post.set('type', 'fedPet');
 
-	//var queryUser = new Parse.Query('_User');
-	feedingLog.get('fedBy').fetch().then(function(user) {
-		console.log('[publishFedPet] Info=\'Retrieved user\'');
-		post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
-		post.set('causingUser', user);
-		
-		return feedingLog.get('petFed').fetch();
-	}).then(function(pet){
-		console.log('[publishFedPet] Info=\'Retrieved pet\'');
-		post.set('aboutPet', pet);
-		post.set('image', pet.get('profilePhoto'));
-		return post.save();
-	}).then(function(post){
-		console.log('[publishFedPet] Info=\'Saved post\'');
-		if(propagatePost(post)){
-			console.log('[publishFedPet] Info=\'propagatePost\'');
-			return true;
-		}
-	}, function(error) {
-		console.log('[publishFedPet] Info=\'Error\' error=' + error.message);
-		return false;
+	return new Promise(function(fulfill, reject){
+		feedingLog.get('fedBy').fetch().then(function(user) {
+			console.log('[publishFedPet] Info=\'Retrieved user\'');
+			post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
+			post.set('causingUser', user);
+			
+			return feedingLog.get('petFed').fetch();
+		}).then(function(pet){
+			console.log('[publishFedPet] Info=\'Retrieved pet\'');
+			post.set('aboutPet', pet);
+			post.set('image', pet.get('profilePhoto'));
+			return post.save();
+		}).then(function(post){
+			console.log('[publishFedPet] Info=\'Saved post\'');
+			return propagatePost(post);
+		}, function(error) {
+			console.log('[publishFedPet] Info=\'Error\' error=' + error.message);
+			return reject(error.message);
+		});
 	});
 }
 
@@ -74,11 +75,9 @@ function processPublishQueue(){
 			switch(queueItem.get('type')){
 				case 'fedPet':
 					//if success, destroy the item
-					console.log('[processPublishQueue] Info=\'Result\' ' + publishFedPet(queueItem.get('savedObject')));
-					if(publishFedPet(queueItem.get('savedObject'))){
-						console.log('[processPublishQueue] Info=\'Destroying queueItem\' type=' + queueItem.get('type'));
+					publishFedPet(queueItem.get('savedObject')).then(function(post){
 						queueItem.destroy();
-					}
+					});
 					break;
 				default:
 					console.log('[processPublishQueue] Info=\'Unknown post type\' type=' + queueItem.get('type'));

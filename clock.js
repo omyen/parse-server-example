@@ -6,6 +6,7 @@ var RETRIES = 5;
 
 function propagatePost(post){
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
+	post.get('causingUser').relation('posts').add(post);
 
 	Parse.Object.saveAll(toSave).then(function(result) {
 		return true;
@@ -16,11 +17,11 @@ function propagatePost(post){
 
 function publishFedPet(feedingLog){
 	console.log('[publishFedPet] Info=\'Processing object\' + fedBy=' + feedingLog.get('fedBy'));
-	// if(feedingLog.className != 'FeedingLog'){
-	// 	//unrecoverable, delete immediately
-	// 	console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);
-	// 	return true;
-	// }
+	if(feedingLog.className != 'FeedingLog'){
+		//unrecoverable, delete immediately
+		console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);
+		return true;
+	}
 
 	var Post = Parse.Object.extend('Post');
 	var post = new Post();

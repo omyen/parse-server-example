@@ -4,7 +4,7 @@ Parse.Cloud.afterSave('FeedingLog', function(req)
 	var queueItem = new PublishQueue;
 
 	queueItem.set('type', 'fedPet');
-	queueItem.set('feedingLog', req.object.get('feedingLog'));
+	queueItem.set('feedingLog', req.object.get('FeedingLog'));
 
 	queueItem.save();
 });

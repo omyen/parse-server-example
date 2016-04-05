@@ -16,7 +16,7 @@ function propagatePost(post){
 
 function publishFedPet(feedingLog){
 	console.log('[publishFedPet] Info=\'Processing object\'');
-	if(savedObject.get('className') != 'FeedingLog'){
+	if(feedingLog.get('className') != 'FeedingLog'){
 		//unrecoverable, delete immediately
 		console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.get('className'));
 		return true;

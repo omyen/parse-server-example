@@ -10,8 +10,10 @@ function propagatePost(post){
 	post.get('causingUser').relation('posts').add(post);
 
 	Parse.Object.saveAll(toSave).then(function(result) {
+		console.log('[publishFedPet] Info=\'OK\'');
 		return true;
 	}, function(error) {
+		console.log('[propagatePost] Info=\'Error\' error=' + error.message);
 		return false;
 	}); 
 }

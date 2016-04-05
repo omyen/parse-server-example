@@ -17,6 +17,7 @@ function propagatePost(post){
 function publishFedPet(feedingLog){
 	if(savedObject.get('className') != 'FeedingLog'){
 		//unrecoverable, delete immediately
+		console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + savedObject.get('className'));
 		return true;
 	}
 
@@ -58,6 +59,7 @@ function processPublishQueue(){
 				queueItem.destroy();
 			} else {
 				queueItem.set('retries', queueItem.get('retries') + 1);
+				queueItem.save();
 			}
 
 			switch(queueItem.get('type')){
@@ -68,6 +70,7 @@ function processPublishQueue(){
 					}
 					break;
 				default:
+					console.log('[processPublishQueue] Info=\'Unknown post type\' type=' + queueItem.get('type'));
 					break;
 			}
 		});

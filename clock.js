@@ -1,18 +1,29 @@
+var Parse = require('parse/node');
+Parse.initialize(process.env.APP_ID, process.env.MASTER_KEY);
+Parse.serverURL = process.env.SERVER_URL;
+
 var RETRIES = 5;
 
-function publishFedPet(feedingLog){
-	console.log(feedingLog.get('petFedName'));
+function publishFedPet(savedObject){
+	if(savedObject.get('className') != 'FeedingLog'){
+		//unrecoverable, delete immediately
+		return true;
+	}
+
+	var query = new Parse.query('FeedingLog');
+	query.get(savedObject.get('objectId')).then(function(feedingLog) {
+		console.log(feedingLog);
+	}, function(error) {
+		return false;
+	});
 
 	return true;
 }
 
 
 function processPublishQueue(){
-	var Parse = require('parse/node');
-	Parse.initialize(process.env.APP_ID, process.env.MASTER_KEY);
-	Parse.serverURL = process.env.SERVER_URL;
-
 	var query = new Parse.Query('PublishQueue');
+	query.include('savedObject');
 
 	query.find().then(function(publishQueue){
 		publishQueue.forEach(function(queueItem){
@@ -26,7 +37,7 @@ function processPublishQueue(){
 			switch(queueItem.get('type')){
 				case 'fedPet':
 					//if success, destroy the item
-					if(publishFedPet(queueItem.get('feedingLog'))){
+					if(publishFedPet(queueItem.get('savedObject'))){
 						queueItem.destroy();
 					}
 					break;

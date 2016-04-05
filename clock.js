@@ -2,10 +2,11 @@ var Parse = require('parse/node');
 Parse.initialize(process.env.APP_ID, '', process.env.MASTER_KEY); //middle var is js key - null
 Parse.serverURL = process.env.SERVER_URL;
 
+Parse.Cloud.useMasterKey();
+
 var RETRIES = 2;
 
 function propagatePost(post){
-	Parse.Cloud.useMasterKey();
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
 	post.get('causingUser').relation('posts').add(post);
 

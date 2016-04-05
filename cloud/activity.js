@@ -1,5 +1,5 @@
 var Parse = require('parse/node');
-Parse.initialize(process.env.APP_ID, process.env.MASTER_KEY);
+Parse.initialize(process.env.APP_ID, '', process.env.MASTER_KEY); //middle var is js key - null
 Parse.serverURL = process.env.SERVER_URL;
 
 console.log('Running publish scheduled job');

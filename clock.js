@@ -4,20 +4,37 @@ Parse.serverURL = process.env.SERVER_URL;
 
 var RETRIES = 5;
 
-function publishFedPet(savedObject){
+function propagatePost(post){
+	
+	return true;
+}
+
+function publishFedPet(feedingLog){
 	if(savedObject.get('className') != 'FeedingLog'){
 		//unrecoverable, delete immediately
 		return true;
 	}
 
-	var query = new Parse.query('FeedingLog');
-	query.get(savedObject.get('objectId')).then(function(feedingLog) {
-		console.log(feedingLog);
+	var Post = Parse.Object.extend('Post');
+	var post = new Post();
+	post.set('type', 'fedPet');
+
+	var queryUser = new Parse.Query('_User');
+	queryUser.get(feedingLog.fedBy.get('objectId')).then(function(user) {
+		post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
+		post.set('causingUser', user);
+		
+		var queryPet = new Parse.Query('Pet');
+		return queryPet.get(feedingLog.petFed.get('objectId'));
+	}).then(function(pet){
+		post.set('aboutPet', pet);
+		post.set('image', pet.get('profilePhoto'));
+		return post.save();
+	}).then(function(post){
+		return propagatePost(post);
 	}, function(error) {
 		return false;
 	});
-
-	return true;
 }
 
 

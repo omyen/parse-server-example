@@ -1,7 +1,7 @@
 var RETRIES = 5;
 
 function publishFedPet(feedingLog){
-	console.log('Running publishFedPet');
+	console.log(feedingLog.get('petFedName'));
 
 	return true;
 }
@@ -11,7 +11,6 @@ function processPublishQueue(){
 	var Parse = require('parse/node');
 	Parse.initialize(process.env.APP_ID, process.env.MASTER_KEY);
 	Parse.serverURL = process.env.SERVER_URL;
-	console.log('Running publish scheduled job from clock.js');
 
 	var query = new Parse.Query('PublishQueue');
 

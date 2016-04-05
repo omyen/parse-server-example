@@ -35,7 +35,7 @@ function processPublishQueue(){
 					break;
 			}
 		});
-	}
+	});
 }
 
 

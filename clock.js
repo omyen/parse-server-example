@@ -44,7 +44,10 @@ function publishFedPet(feedingLog){
 		return post.save();
 	}).then(function(post){
 		console.log('[publishFedPet] Info=\'Saved post\'');
-		return propagatePost(post);
+		if(propagatePost(post)){
+			console.log('[publishFedPet] Info=\'propagatePost\'');
+			return true;
+		}
 	}, function(error) {
 		console.log('[publishFedPet] Info=\'Error\' error=' + error.message);
 		return false;

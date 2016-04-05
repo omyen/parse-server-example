@@ -16,11 +16,11 @@ function propagatePost(post){
 
 function publishFedPet(feedingLog){
 	console.log('[publishFedPet] Info=\'Processing object\'');
-	if(feedingLog.className != 'FeedingLog'){
-		//unrecoverable, delete immediately
-		console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);
-		return true;
-	}
+	// if(feedingLog.className != 'FeedingLog'){
+	// 	//unrecoverable, delete immediately
+	// 	console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);
+	// 	return true;
+	// }
 
 	var Post = Parse.Object.extend('Post');
 	var post = new Post();

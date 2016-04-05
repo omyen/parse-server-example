@@ -15,7 +15,7 @@ function propagatePost(post){
 }
 
 function publishFedPet(feedingLog){
-	console.log('[publishFedPet] Info=\'Processing object\' + userId=' + feedingLog.get('fedBy').get('objectId'));
+	console.log('[publishFedPet] Info=\'Processing object\' + fedBy=' + feedingLog.get('fedBy'));
 	// if(feedingLog.className != 'FeedingLog'){
 	// 	//unrecoverable, delete immediately
 	// 	console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);
@@ -27,13 +27,12 @@ function publishFedPet(feedingLog){
 	post.set('type', 'fedPet');
 
 	//var queryUser = new Parse.Query('_User');
-	queryUser.get(feedingLog.get('fedBy').get('objectId')).then(function(user) {
+	feedingLog.get('fedBy').fetch().then(function(user) {
 		console.log('[publishFedPet] Info=\'Retrieved user\'');
 		post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
 		post.set('causingUser', user);
 		
-		var queryPet = new Parse.Query('Pet');
-		return queryPet.get(feedingLog.get('petFed').get('objectId'));
+		return feedingLog.get('petFed').fetch();
 	}).then(function(pet){
 		console.log('[publishFedPet] Info=\'Retrieved pet\'');
 		post.set('aboutPet', pet);

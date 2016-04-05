@@ -5,6 +5,8 @@ Parse.Cloud.afterSave('FeedingLog', function(req)
 
 	queueItem.set('type', 'fedPet');
 	queueItem.set('feedingLog', req.object.get('feedingLog');
+
+	queueItem.save();
 });
 
 Parse.Cloud.define('checkPassword', function(request, response) 

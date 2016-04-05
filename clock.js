@@ -15,7 +15,7 @@ function processPublishQueue(){
 
 	var query = new Parse.Query('PublishQueue');
 
-	query.find().then(function(publishQueue)){
+	query.find().then(function(publishQueue){
 		publishQueue.forEach(function(queueItem){
 
 			if(queueItem.get('retries')>RETRIES){

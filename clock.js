@@ -15,9 +15,10 @@ function propagatePost(post){
 }
 
 function publishFedPet(feedingLog){
+	console.log('[publishFedPet] Info=\'Processing object\'');
 	if(savedObject.get('className') != 'FeedingLog'){
 		//unrecoverable, delete immediately
-		console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + savedObject.get('className'));
+		console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.get('className'));
 		return true;
 	}
 
@@ -63,7 +64,7 @@ function processPublishQueue(){
 				queueItem.set('retries', queueItem.get('retries') + 1);
 				queueItem.save();
 			}
-
+			console.log('[processPublishQueue] Info=\'Processing post\' type=' + queueItem.get('type'));
 			switch(queueItem.get('type')){
 				case 'fedPet':
 					//if success, destroy the item

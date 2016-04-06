@@ -10,7 +10,29 @@ function propagatePost(post){
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
 	post.get('causingUser').relation('posts').add(post);
 
-	return Parse.Object.saveAll(toSave);
+	//show it to the causing user's friends
+	var relation = post.get('causingUser').relation('friends');
+	var query = relation.query();
+
+	return query.find().then(function(results){
+		results.forEach(function(friend){
+			toSave.push(friend);
+			friend.relation('posts').add(post);
+		});
+
+		//show it to all the owners of the about pet
+		relation = post.get('aboutPet').relation('owners');
+		query = relation.query();
+		return query.find();
+	}).then(function(results){
+		results.forEach(function(owner){
+			toSave.push(owner);
+			owner.relation('posts').add(post);
+		});
+
+		return Parse.Object.saveAll(toSave);
+	});
+	
 }
 
 function publishFedPet(post, feedingLog){

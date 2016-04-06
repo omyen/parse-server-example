@@ -215,6 +215,7 @@ Parse.Cloud.define('getPosts', function(req, res) {
 	queryPosts.limit(req.params.numPosts);
 	queryPosts.skip(req.params.startPost);
 	queryPosts.include('image');
+	queryPosts.include('pattedBy');
 	queryPosts.descending('updatedAt');
 
 	queryPosts.find().then(function(results){

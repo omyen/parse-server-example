@@ -13,7 +13,7 @@ function propagatePost(post){
 	return Parse.Object.saveAll(toSave);
 }
 
-function publishFedPet(feedingLog){
+function publishFedPet(post, feedingLog){
 	console.log('[publishFedPet] Info=\'Processing object\' + fedBy=' + feedingLog.get('fedBy'));
 	// if(feedingLog.className != 'FeedingLog'){
 	// 	//unrecoverable, delete immediately
@@ -21,8 +21,7 @@ function publishFedPet(feedingLog){
 	// 	return true;
 	// }
 
-	var Post = Parse.Object.extend('Post');
-	var post = new Post();
+	
 	post.set('type', 'fedPet');
 
 
@@ -61,10 +60,15 @@ function processPublishQueue(){
 				queueItem.save();
 			}
 			console.log('[processPublishQueue] Info=\'Processing post\' type=' + queueItem.get('type'));
+
+			var Post = Parse.Object.extend('Post');
+			var post = new Post();
+			post.set('numberPats', 0);
+
 			switch(queueItem.get('type')){
 				case 'fedPet':
 					//if success, destroy the item
-					publishFedPet(queueItem.get('savedObject')).then(function(post){
+					publishFedPet(post, queueItem.get('savedObject')).then(function(post){
 						queueItem.destroy();
 					});
 					break;

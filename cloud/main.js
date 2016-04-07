@@ -1,7 +1,9 @@
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
-	req.object.set('lastDirtyKeys', req.object.dirtyKeys());
-	console.log('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + req.object.dirtyKeys().length);
+	var dirtyKeys = req.object.get('lastDirtyKeys');
+	console.log('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
+	req.object.set('lastDirtyKeys', dirtyKeys);
+	
 	res.success(true);
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
 });
@@ -46,7 +48,7 @@ Parse.Cloud.afterSave('FeedingLog', function(req)
 	queueItem.set('type', 'fedPet');
 	queueItem.set('savedObject', req.object);
 	queueItem.set('causingUser', req.object.get('fedBy'));
-	queueItem.set('aboutPet', req.object.get('fedPet'));
+	queueItem.set('aboutPet', req.object.get('petFed'));
 
 	queueItem.save();
 });

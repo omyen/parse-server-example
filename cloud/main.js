@@ -40,6 +40,16 @@ Parse.Cloud.define('signUp', function(req, res) {
 	user.set('username_lowercase', req.params.username.toLowerCase()); //for searching
 	user.set('password', req.params.password);
 
+	var Post = Parse.Object.extend('Post');
+	var post = new Post();
+
+	post.set('title', 'Welcome to Doubledip!');
+	post.set('text', 'This is your activity feed, where you\'ll see everything happening on your network. \
+		Try adding a new pet in the Pets tab, or find your friends in the Friends tab.'
+		);
+
+	user.relation('posts').add(post);
+
 	user.signUp().then(
 		function(user) {
 			console.log('[signup] Info=\'Signup successful\' username=' + user.get('username') + ' password=' + user.get('password'));

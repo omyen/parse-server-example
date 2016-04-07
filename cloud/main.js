@@ -23,7 +23,7 @@ Parse.Cloud.beforeSave('Pet', function(req)
 				break;
 		}
 	}
-
+	response.success();
     
 });
 

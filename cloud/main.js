@@ -50,9 +50,11 @@ Parse.Cloud.define('signUp', function(req, res) {
 		);
 	post.set('numberPats', 0);
 
-	user.relation('posts').add(post);
-
-	user.signUp().then(
+	post.save().then(
+		function(post){
+			user.relation('posts').add(post);
+			return user.signUp() 
+		}).then(
 		function(user) {
 			console.log('[signup] Info=\'Signup successful\' username=' + user.get('username') + ' password=' + user.get('password'));
 

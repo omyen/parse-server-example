@@ -30,7 +30,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 		res.success(true);
 	}, function(error){
 		res.error(error.message);
-	}
+	});
 	
     
 });

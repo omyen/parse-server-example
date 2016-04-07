@@ -5,7 +5,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 	req.object.set('lastDirtyKeys', dirtyKeys);
 	req.object.set('test', 'testing');
 	
-	res.success(true);
+	res.success(req.object);
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
 });
 

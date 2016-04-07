@@ -47,6 +47,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	post.set('text', 'This is your activity feed, where you\'ll see everything happening on your network. \
 		Try adding a new pet in the Pets tab, or find your friends in the Friends tab.'
 		);
+	post.set('numberPats', 0);
 
 	user.relation('posts').add(post);
 

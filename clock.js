@@ -102,12 +102,16 @@ function processPublishQueue(){
 					//if success, destroy the item
 					publishNewPetPhoto(post, queueItem).then(function(post){
 						queueItem.destroy();
+					}, function(error){
+						console.log('[processPublishQueue] Info=\'failed processing publishNewPetPhoto\' error=' + error.message);
 					});
 					break;
 				case 'newPetPhoto':
 					//if success, destroy the item
 					publishFedPet(post, queueItem).then(function(post){
 						queueItem.destroy();
+					}, function(error){
+						console.log('[processPublishQueue] Info=\'failed processing publishFedPet\' error=' + error.message);
 					});
 					break;
 				default:

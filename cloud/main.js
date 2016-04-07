@@ -3,6 +3,8 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 	var dirtyKeys = req.object.dirtyKeys();
 	console.log('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
 
+	var toSave = [];
+
 	for (var i = 0; i < dirtyKeys.length; ++i) {
 		var dirtyKey = dirtyKeys[i];
 		switch(dirtyKey){
@@ -17,13 +19,19 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 				queueItem.set('causingUser', Parse.User.current());
 				queueItem.set('aboutPet', req.object);
 
-				queueItem.save();
+				toSave.push(queueItem);
 				break;
 			default:
 				break;
 		}
 	}
-	res.success(true);
+
+	Parse.Object.saveAll(toSave).then(function(result){
+		res.success(true);
+	}, function(error){
+		res.error(error.message);
+	}
+	
     
 });
 

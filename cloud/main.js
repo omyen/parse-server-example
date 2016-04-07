@@ -27,8 +27,10 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 	}
 
 	Parse.Object.saveAll(toSave).then(function(result){
+		console.log('[beforeSave] Info=\'Pet saved all queueItems\'');
 		res.success(true);
 	}, function(error){
+		console.log('[beforeSave] Info=\'Pet save all queueItems was error\' error=' + error.message);
 		res.error(error.message);
 	});
 	

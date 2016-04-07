@@ -3,26 +3,26 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 	var dirtyKeys = req.object.dirtyKeys();
 	console.log('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
 
-	// for (var i = 0; i < dirtyKeys.length; ++i) {
-	// 	var dirtyKey = dirtyKeys[i];
-	// 	switch(dirtyKey){
-	// 		case 'profilePhoto':
-	// 			console.log('[beforeSave] Info=\'Pet profilePhoto is dirty\'');
-	// 			//profilePhoto is the latest photo
-	// 			var PublishQueue = Parse.Object.extend('PublishQueue');
-	// 			var queueItem = new PublishQueue;
+	for (var i = 0; i < dirtyKeys.length; ++i) {
+		var dirtyKey = dirtyKeys[i];
+		switch(dirtyKey){
+			case 'profilePhoto':
+				console.log('[beforeSave] Info=\'Pet profilePhoto is dirty\'');
+				// //profilePhoto is the latest photo
+				// var PublishQueue = Parse.Object.extend('PublishQueue');
+				// var queueItem = new PublishQueue;
 
-	// 			queueItem.set('type', 'newPetPhoto');
-	// 			queueItem.set('savedObject', req.object);
-	// 			queueItem.set('causingUser', Parse.User.current());
-	// 			queueItem.set('aboutPet', req.object);
+				// queueItem.set('type', 'newPetPhoto');
+				// queueItem.set('savedObject', req.object);
+				// queueItem.set('causingUser', Parse.User.current());
+				// queueItem.set('aboutPet', req.object);
 
-	// 			queueItem.save();
-	// 			break;
-	// 		default:
-	// 			break;
-	// 	}
-	// }
+				// queueItem.save();
+				break;
+			default:
+				break;
+		}
+	}
 	res.success(true);
     
 });

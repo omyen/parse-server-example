@@ -1,7 +1,14 @@
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
-	var dirtyKeys = req.object.dirtyKeys();
-	console.log('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
+	req.object.set('lastDirtyKeys', req.object.dirtyKeys());
+	res.success(true);
+	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
+});
+
+Parse.Cloud.afterSave('Pet', function(req) 
+{
+    var dirtyKeys = req.object.get('lastDirtyKeys');
+	console.log('[afterSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
 
 	var toSave = [];
 
@@ -9,7 +16,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 		var dirtyKey = dirtyKeys[i];
 		switch(dirtyKey){
 			case 'profilePhoto':
-				console.log('[beforeSave] Info=\'Pet profilePhoto is dirty\'');
+				console.log('[afterSave] Info=\'Pet profilePhoto is dirty\'');
 				//profilePhoto is the latest photo
 				var PublishQueue = Parse.Object.extend('PublishQueue');
 				var queueItem = new PublishQueue;
@@ -26,15 +33,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 		}
 	}
 
-	// Parse.Object.saveAll(toSave).then(function(result){
-	// 	console.log('[beforeSave] Info=\'Pet saved all queueItems\'');
-	 	res.success(true);
-	// }, function(error){
-	// 	console.log('[beforeSave] Info=\'Pet save all queueItems was error\' error=' + error.message);
-	// 	res.error(error.message);
-	// });
-	
-    
+	Parse.Object.saveAll(toSave)
 });
 
 Parse.Cloud.afterSave('FeedingLog', function(req) 

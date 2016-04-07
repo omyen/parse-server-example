@@ -98,7 +98,7 @@ function processPublishQueue(){
 			post.set('aboutPet', queueItem.get('aboutPet'));
 
 			switch(queueItem.get('type')){
-				case 'fedPet':
+				case 'newPetPhoto':
 					//if success, destroy the item
 					publishNewPetPhoto(post, queueItem).then(function(post){
 						queueItem.destroy();
@@ -106,7 +106,7 @@ function processPublishQueue(){
 						console.log('[processPublishQueue] Info=\'failed processing publishNewPetPhoto\' error=' + error.message);
 					});
 					break;
-				case 'newPetPhoto':
+				case 'fedPet':
 					//if success, destroy the item
 					publishFedPet(post, queueItem).then(function(post){
 						queueItem.destroy();

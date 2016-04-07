@@ -1,3 +1,30 @@
+Parse.Cloud.beforeSave('Pet', function(req) 
+{
+	var dirtyKeys = req.object.dirtyKeys();
+
+	for (var i = 0; i < dirtyKeys.length; ++i) {
+		var dirtyKey = dirtyKeys[i];
+		switch(dirtyKey){
+			case 'profilePhoto':
+				//profilePhoto is the latest photo
+				var PublishQueue = Parse.Object.extend('PublishQueue');
+				var queueItem = new PublishQueue;
+
+				queueItem.set('type', 'newPetPhoto');
+				queueItem.set('savedObject', req.object);
+				queueItem.set('causingUser', Parse.User.current(););
+				queueItem.set('aboutPet', req.object);
+
+				queueItem.save();
+				break;
+			default:
+				break;
+		}
+	}
+
+    
+});
+
 Parse.Cloud.afterSave('FeedingLog', function(req) 
 {
     var PublishQueue = Parse.Object.extend('PublishQueue');
@@ -5,6 +32,8 @@ Parse.Cloud.afterSave('FeedingLog', function(req)
 
 	queueItem.set('type', 'fedPet');
 	queueItem.set('savedObject', req.object);
+	queueItem.set('causingUser', req.object.get('fedBy'));
+	queueItem.set('aboutPet', req.object.get('fedPet'));
 
 	queueItem.save();
 });

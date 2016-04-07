@@ -21,9 +21,13 @@ function propagatePost(post){
 		});
 
 		//show it to all the owners of the about pet
-		relation = post.get('aboutPet').relation('owners');
-		query = relation.query();
-		return query.find();
+		if(post.get('aboutPet')){
+			relation = post.get('aboutPet').relation('owners');
+			query = relation.query();
+			return query.find();
+		} else {
+			return Parse.Object.saveAll(toSave);
+		}
 	}).then(function(results){
 		results.forEach(function(owner){
 			toSave.push(owner);
@@ -35,31 +39,32 @@ function propagatePost(post){
 	
 }
 
-function publishFedPet(post, feedingLog){
-	console.log('[publishFedPet] Info=\'Processing object\' + fedBy=' + feedingLog.get('fedBy'));
-	// if(feedingLog.className != 'FeedingLog'){
-	// 	//unrecoverable, delete immediately
-	// 	console.log('[publishFedPet] Info=\'Wrong object type\' objectType=' + feedingLog.className);
-	// 	return true;
-	// }
+function publishFedPet(post, queueItem){
+	console.log('[publishFedPet] Info=\'Processing object\'');
 
-	
+	var feedingLog = queueItem.get('savedObject');
+
 	post.set('type', 'fedPet');
+	post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
+	post.set('image', pet.get('profilePhoto'));
 
-
-	return feedingLog.get('fedBy').fetch().then(function(user) {
-		console.log('[publishFedPet] Info=\'Retrieved user\'');
-		post.set('title', user.get('displayName') + ' fed ' + feedingLog.get('petFedName'));
-		post.set('causingUser', user);
-		
-		return feedingLog.get('petFed').fetch();
-	}).then(function(pet){
-		console.log('[publishFedPet] Info=\'Retrieved pet\'');
-		post.set('aboutPet', pet);
-		post.set('image', pet.get('profilePhoto'));
-		return post.save();
-	}).then(function(post){
+	return post.save().then(function(post){
 		console.log('[publishFedPet] Info=\'Saved post\'');
+		return propagatePost(post);
+	});
+
+}
+
+
+function publishNewPetPhoto(post, queueItem){
+	console.log('[publishNewPetPhoto] Info=\'Processing object\'');
+
+	post.set('type', 'newPetPhoto');
+	post.set('title', queueItem.get('causingUser').get('displayName') + ' added a new photo of ' + queueItem.get('aboutPet').get('name'));
+	post.set('image', queueItem.get('photo'));
+
+	return post.save().then(function(post){
+		console.log('[publishNewPetPhoto] Info=\'Saved post\'');
 		return propagatePost(post);
 	});
 
@@ -69,6 +74,9 @@ function publishFedPet(post, feedingLog){
 function processPublishQueue(){
 	var query = new Parse.Query('PublishQueue');
 	query.include('savedObject');
+	query.include('causingUser');
+	query.include('aboutPet');
+	query.include('photo');
 
 	query.find().then(function(publishQueue){
 		publishQueue.forEach(function(queueItem){
@@ -78,7 +86,7 @@ function processPublishQueue(){
 			}else if(queueItem.get('retries')>RETRIES){
 				queueItem.destroy();
 			} else {
-				queueItem.set('retries', queueItem.get('retries') + 1);
+				queueItem.increment('retries');
 				queueItem.save();
 			}
 			console.log('[processPublishQueue] Info=\'Processing post\' type=' + queueItem.get('type'));
@@ -86,11 +94,19 @@ function processPublishQueue(){
 			var Post = Parse.Object.extend('Post');
 			var post = new Post();
 			post.set('numberPats', 0);
+			post.set('causingUser', queueItem.get('causingUser'));
+			post.set('aboutPet', queueItem.get('aboutPet'));
 
 			switch(queueItem.get('type')){
 				case 'fedPet':
 					//if success, destroy the item
-					publishFedPet(post, queueItem.get('savedObject')).then(function(post){
+					publishNewPetPhoto(post, queueItem).then(function(post){
+						queueItem.destroy();
+					});
+					break;
+				case 'newPetPhoto':
+					//if success, destroy the item
+					publishFedPet(post, queueItem).then(function(post){
 						queueItem.destroy();
 					});
 					break;

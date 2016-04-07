@@ -1,4 +1,4 @@
-Parse.Cloud.beforeSave('Pet', function(req) 
+Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
 	var dirtyKeys = req.object.dirtyKeys();
 	console.log('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
@@ -23,7 +23,7 @@ Parse.Cloud.beforeSave('Pet', function(req)
 				break;
 		}
 	}
-	response.success();
+	res.success();
     
 });
 

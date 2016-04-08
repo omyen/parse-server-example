@@ -1,9 +1,9 @@
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
-	//var dirtyKeys = req.object.dirtyKeys();
+	var dirtyKeys = req.object.dirtyKeys();
 	//console.log('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
 	//why can't i just set this directly?
-	//req.object.set('lastDirtyKeys', dirtyKeys);
+	req.object.set('lastDirtyKeys', dirtyKeys);
 	req.object.set('foo', 'baz');
 	
 	res.success();

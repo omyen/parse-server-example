@@ -31,11 +31,12 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 				console.log('[afterSave] Info=\'User1\' %j', req.user);
 
-				console.log('[afterSave] Info=\'User2\' ' + req.user.objectId);
+				//console.log('[afterSave] Info=\'User2\' ' + req.user.objectId);
 
 				queueItem.set('causingUser', req.user);
+				console.log('[afterSave] Info=\'User3\'');
 				queueItem.set('aboutPet', req.object);
-				console.log('[afterSave] Info=\'User4\' id=' + user.id);
+				console.log('[afterSave] Info=\'User4\'');
 				toSave.push(queueItem);
 				break;
 			default:

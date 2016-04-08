@@ -27,13 +27,16 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 				queueItem.set('type', 'newPetPhoto');
 				queueItem.set('req', req);
+				console.log('[afterSave] Info=\'User0\'');
 				var User = Parse.Object.extend('_User');
+				console.log('[afterSave] Info=\'User1\'');
 				var user = new User();
+				console.log('[afterSave] Info=\'User2\'');
 				user.id = req.object.user.objectId;
-				console.log('[afterSave] Info=\'User\' id=' + user.id);
+				console.log('[afterSave] Info=\'User3\' id=' + user.id);
 				queueItem.set('causingUser', user);
 				queueItem.set('aboutPet', req.object);
-				console.log('[afterSave] Info=\'User2\' id=' + user.id);
+				console.log('[afterSave] Info=\'User4\' id=' + user.id);
 				toSave.push(queueItem);
 				break;
 			default:

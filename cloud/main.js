@@ -30,9 +30,10 @@ Parse.Cloud.afterSave('Pet', function(req)
 				var User = Parse.Object.extend('_User');
 				var user = new User();
 				user.id = req.object.user.objectId;
+				console.log('[afterSave] Info=\'User\' id=' + user.id);
 				queueItem.set('causingUser', user);
 				queueItem.set('aboutPet', req.object);
-
+				console.log('[afterSave] Info=\'User2\' id=' + user.id);
 				toSave.push(queueItem);
 				break;
 			default:

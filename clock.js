@@ -44,7 +44,7 @@ function publishFedPet(post, queueItem){
 
 	post.set('type', 'fedPet');
 	post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
-	post.set('image', pet.get('profilePhoto'));
+	post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
 
 	return post.save().then(function(post){
 		console.log('[publishFedPet] Info=\'Saved post\'');

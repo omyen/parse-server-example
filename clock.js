@@ -42,8 +42,6 @@ function propagatePost(post){
 function publishFedPet(post, queueItem){
 	console.log('[publishFedPet] Info=\'Processing object\'');
 
-	var feedingLog = queueItem.get('savedObject');
-
 	post.set('type', 'fedPet');
 	post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
 	post.set('image', pet.get('profilePhoto'));

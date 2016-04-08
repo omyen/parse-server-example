@@ -26,7 +26,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 				var queueItem = new PublishQueue;
 
 				queueItem.set('type', 'newPetPhoto');
-				queueItem.set('savedObject', req.object);
+				queueItem.set('req', req);
 				queueItem.set('causingUser', Parse.User.current());
 				queueItem.set('aboutPet', req.object);
 
@@ -47,7 +47,7 @@ Parse.Cloud.afterSave('FeedingLog', function(req)
 	var queueItem = new PublishQueue;
 
 	queueItem.set('type', 'fedPet');
-	queueItem.set('savedObject', req.object);
+	queueItem.set('req', req);
 	queueItem.set('causingUser', req.object.get('fedBy'));
 	queueItem.set('aboutPet', req.object.get('petFed'));
 

@@ -27,7 +27,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 				queueItem.set('type', 'newPetPhoto');
 				queueItem.set('req', req);
-				queueItem.set('causingUser', req.user);
+				//queueItem.set('causingUser', req.user);
 				queueItem.set('aboutPet', req.object);
 
 				toSave.push(queueItem);

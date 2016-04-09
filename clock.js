@@ -105,6 +105,25 @@ function publishNewPetPhoto(post, queueItem){
 
 }
 
+function publishNewPet(post, queueItem){
+	log.info('[publishNewPet] Info=\'Processing object\'');
+	log.debug('[publishNewPet] queueItem=%j', queueItem)
+
+	try{
+		post.set('type', 'newPet');
+		post.set('title', queueItem.get('causingUser').get('displayName') + ' added a new pet called ' + queueItem.get('aboutPet').get('name'));	
+	} catch (e){
+		log.error('[publishNewPet] Info=\'Failed to set post properties\' error=' + e.message);
+		return Parse.Promise.error(e);
+	}
+
+	return post.save().then(function(post){
+		log.debug('[publishNewPet] Info=\'Saved post\'');
+		return propagatePost(post);
+	});
+
+}
+
 
 function processPublishQueue(){
 	var query = new Parse.Query('PublishQueue');
@@ -144,6 +163,14 @@ function processPublishQueue(){
 						queueItem.destroy();
 					}, function(error){
 						log.error('[processPublishQueue] Info=\'failed processing publishNewPetPhoto\' error=' + error.message);
+					});
+					break;
+				case 'newPet':
+					//if success, destroy the item
+					publishNewPet(post, queueItem).then(function(results){
+						queueItem.destroy();
+					}, function(error){
+						log.error('[processPublishQueue] Info=\'failed processing publishNewPet\' error=' + error.message);
 					});
 					break;
 				case 'fedPet':

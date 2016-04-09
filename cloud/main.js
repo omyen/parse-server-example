@@ -15,6 +15,24 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 Parse.Cloud.afterSave('Pet', function(req) 
 {
+	//first check to see if it's a brand new pet :3
+	if(!req.object.existed()){
+		try{
+			var PublishQueue = Parse.Object.extend('PublishQueue');
+			var queueItem = new PublishQueue;
+
+			queueItem.set('type', 'newPet');
+			queueItem.set('req', req);
+			queueItem.set('causingUser', req.user);
+			queueItem.set('aboutPet', req.object);
+			queueItem.save();
+		} catch (e){
+			log.error('[afterSave Pet] Info=\'Failed to set post properties for new pet\' error=' + e.message);
+		}
+		return;
+	}
+
+	//otherwise let's see what changed
     var dirtyKeys = req.object.get('lastDirtyKeys');
     if(!dirtyKeys) {
     	log.error('[afterSave Pet] Info=\'No dirtyKeys\'');
@@ -31,14 +49,19 @@ Parse.Cloud.afterSave('Pet', function(req)
 			case 'profilePhoto':
 				log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty\'');
 				//profilePhoto is the latest photo
-				var PublishQueue = Parse.Object.extend('PublishQueue');
-				var queueItem = new PublishQueue;
+				try{
+					var PublishQueue = Parse.Object.extend('PublishQueue');
+					var queueItem = new PublishQueue;
 
-				queueItem.set('type', 'newPetPhoto');
-				queueItem.set('req', req);
-				queueItem.set('causingUser', req.user);
-				queueItem.set('aboutPet', req.object);
-				queueItem.set('photo', req.object.get('profilePhoto'));
+					queueItem.set('type', 'newPetPhoto');
+					queueItem.set('req', req);
+					queueItem.set('causingUser', req.user);
+					queueItem.set('aboutPet', req.object);
+					queueItem.set('photo', req.object.get('profilePhoto'));
+				} catch (e){
+					log.error('[afterSave Pet] Info=\'Failed to set post properties for profilePhoto update\' error=' + e.message);
+					return; 
+				}
 
 				toSave.push(queueItem);
 				break;

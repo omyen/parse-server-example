@@ -90,10 +90,6 @@ Parse.Cloud.define('signUp', function(req, res) {
 	var PrivateData = Parse.Object.extend('PrivateData');
 	var privateData = new PrivateData();
 	privateData.set('email', req.params.email);
-	var acl = new Parse.ACL();
-	acl.setPublicReadAccess(false);
-	acl.setWriteAccess(user, true);
-	privateData.setACL(acl);
 	promises.push(privateData.save());
 
 	var User = Parse.Object.extend('_User');
@@ -120,8 +116,15 @@ Parse.Cloud.define('signUp', function(req, res) {
 			acl.setPublicReadAccess(true);
 			acl.setWriteAccess(user, true);
 			user.setACL(acl);
+			promises = [user.save(null, {useMasterKey:true})];
 
-			return user.save(null, {useMasterKey:true});
+			var acl = new Parse.ACL();
+			acl.setPublicReadAccess(false);
+			acl.setWriteAccess(user, true);
+			privateData.setACL(acl);
+			promises.push(privateData.save());
+
+			return Parse.Promises.when(promises);
 		}).then(
 		function(user){
 			log.debug('[signup] Info=\'Saved user\'');

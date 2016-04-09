@@ -1,4 +1,7 @@
 //require('log-buffer');
+var log = require('loglevel');
+
+log.setLevel('debug');
 
 var Parse = require('parse/node');
 Parse.initialize(process.env.APP_ID, '', process.env.MASTER_KEY); //middle var is js key - null
@@ -42,14 +45,15 @@ function propagatePost(post){
 }
 
 function publishFedPet(post, queueItem){
-	console.log('[publishFedPet] Info=\'Processing object\'');
+	log.info('[publishFedPet] Info=\'Processing object\'');
+	log.debug('[publishFedPet] queueItem=%j', queueItem)
 
 	post.set('type', 'fedPet');
 	post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
 	post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
 
 	return post.save().then(function(post){
-		console.log('[publishFedPet] Info=\'Saved post\'');
+		log.debug('[publishFedPet] Info=\'Saved post\'');
 		return propagatePost(post);
 	});
 
@@ -57,14 +61,15 @@ function publishFedPet(post, queueItem){
 
 
 function publishNewPetPhoto(post, queueItem){
-	console.log('[publishNewPetPhoto] Info=\'Processing object\'');
+	log.info('[publishNewPetPhoto] Info=\'Processing object\'');
+	log.debug('[publishNewPetPhoto] queueItem=%j', queueItem)
 
 	post.set('type', 'newPetPhoto');
 	post.set('title', queueItem.get('causingUser').get('displayName') + ' added a new photo of ' + queueItem.get('aboutPet').get('name'));
 	post.set('image', queueItem.get('photo'));
 
 	return post.save().then(function(post){
-		console.log('[publishNewPetPhoto] Info=\'Saved post\'');
+		log.debug('[publishNewPetPhoto] Info=\'Saved post\'');
 		return propagatePost(post);
 	});
 
@@ -103,7 +108,7 @@ function processPublishQueue(){
 					publishNewPetPhoto(post, queueItem).then(function(results){
 						queueItem.destroy();
 					}, function(error){
-						console.log('[processPublishQueue] Info=\'failed processing publishNewPetPhoto\' error=' + error.message);
+						log.error('[processPublishQueue] Info=\'failed processing publishNewPetPhoto\' error=' + error.message);
 					});
 					break;
 				case 'fedPet':
@@ -111,11 +116,11 @@ function processPublishQueue(){
 					publishFedPet(post, queueItem).then(function(results){
 						queueItem.destroy();
 					}, function(error){
-						console.log('[processPublishQueue] Info=\'failed processing publishFedPet\' error=' + error.message);
+						log.error('[processPublishQueue] Info=\'failed processing publishFedPet\' error=' + error.message);
 					});
 					break;
 				default:
-					console.log('[processPublishQueue] Info=\'Unknown post type\' type=' + queueItem.get('type'));
+					log.warn('[processPublishQueue] Info=\'Unknown post type\' type=' + queueItem.get('type'));
 					break;
 			}
 		});

@@ -6,7 +6,7 @@ log.setLevel('debug');
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
 	var dirtyKeys = req.object.dirtyKeys();
-	log.debug('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
+	log.info('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
 
 	req.object.set('lastDirtyKeys', dirtyKeys);
 	res.success();
@@ -21,7 +21,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 		return; 
  	} 
 
-	log.debug('[afterSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
+	log.info('[afterSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
 
 	var toSave = [];
 
@@ -52,7 +52,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 Parse.Cloud.afterSave('FeedingLog', function(req) 
 {
-	log.debug('[afterSave FeedingLog] Info=\'FeedingLog\'');
+	log.info('[afterSave FeedingLog] Info=\'FeedingLog\'');
     var PublishQueue = Parse.Object.extend('PublishQueue');
 	var queueItem = new PublishQueue;
 
@@ -82,7 +82,7 @@ Parse.Cloud.define('checkPassword', function(request, response)
 Parse.Cloud.define('signUp', function(req, res) {
 	//Parse.Cloud.useMasterKey();
 	//ok to get password in the clear since we are running over https
-	console.log('[signUp] Info=\'Running cloud code\' username=' + req.params.username + ' password=' + req.params.password + ' email=' + req.params.email);
+	log.info('[signUp] Info=\'Running cloud code\' username=' + req.params.username + ' password=' + req.params.password + ' email=' + req.params.email);
 
 	//email is private data
 	var PrivateData = Parse.Object.extend('PrivateData');
@@ -111,7 +111,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 			return user.signUp() 
 		}).then(
 		function(user) {
-			console.log('[signup] Info=\'Signup successful\' username=' + user.get('username') + ' password=' + user.get('password'));
+			log.debug('[signup] Info=\'Signup successful\' username=' + user.get('username') + ' password=' + user.get('password'));
 
 			var acl = new Parse.ACL();
 			acl.setPublicReadAccess(false);
@@ -121,7 +121,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 			return privateData.save();
 		}).then(
 		function(privateData) {
-			console.log('[signup] Info=\'Saved privateData\'');
+			log.debug('[signup] Info=\'Saved privateData\'');
 			user.set('privateData', privateData);
 
 			var acl = new Parse.ACL();
@@ -132,17 +132,17 @@ Parse.Cloud.define('signUp', function(req, res) {
 			return user.save(null, {useMasterKey:true});
 		}).then(
 		function(user) {
-			console.log('[signup] Info=\'Saved user\'');
+			log.debug('[signup] Info=\'Saved user\'');
 			res.success(user);
 		}, function(error) {
-			console.log('[signup] Info=\'Signup failed\' error=' + error.message);
+			log.error('[signup] Info=\'Signup failed\' error=' + error.message);
 			res.error(error.message);
 		});
 });
 
 Parse.Cloud.define('feedPet', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	console.log('[feedPet] Info=\'Running cloud code\' petId=' + req.params.petId + ' fedBy=' + req.params.fedBy + ' fedAt=' + req.params.fedAt);
+	log.info('[feedPet] Info=\'Running cloud code\' petId=' + req.params.petId + ' fedBy=' + req.params.fedBy + ' fedAt=' + req.params.fedAt);
 	var FeedingLog = Parse.Object.extend('FeedingLog');
 	var feedingLog = new FeedingLog();
 	
@@ -160,29 +160,29 @@ Parse.Cloud.define('feedPet', function(req, res) {
 	//user doesn't wait on this, so we can do it all sequentially
 	queryPet.get(req.params.petId).then(
 		function(pet) {
-			console.log('[feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
+			log.debug('[feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
 			mPet.set('lastFed', req.params.fedAt);
 			feedingLog.set('petFed', mPet);
 			feedingLog.set('petFedName', mPet.get('name'));
 			return feedingLog.save();
 		}).then(function(feedingLog){
-			console.log('[feedPet] Info=\'Saved feedingLog successfully\'');
+			log.debug('[feedPet] Info=\'Saved feedingLog successfully\'');
 			var relation = mPet.relation('feedingLogs');
 			relation.add(feedingLog);
 			return mPet.save();
 		}).then(function(pet){
-			console.log('[feedPet] Info=\'Saved pet successfully\'');
+			log.debug('[feedPet] Info=\'Saved pet successfully\'');
 			res.success(pet);
 		}, function(error) {
-			console.log('[feedPet] Info=\'feedPet failed\' error=' + error.message);
+			log.error('[feedPet] Info=\'feedPet failed\' error=' + error.message);
 			res.error(error.message);
 		}); //errors are propagated through the promises until they encounter an error handler - so we only need one!
 });
 
 Parse.Cloud.define('addFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	console.log('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
+	log.info('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
 
 	var FriendRequest = Parse.Object.extend('FriendRequest');
 	var User = Parse.Object.extend('_User');
@@ -206,10 +206,10 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	
 	Parse.Object.saveAll(toSave).then(
 		function(result) {
-			console.log('[addFriend] Info=\'addFriend complete\'');
+			log.debug('[addFriend] Info=\'addFriend complete\'');
 			res.success('OK');
 		}, function(error) {
-			console.log('[addFriend] Info=\'addFriend failed\' error=' + error.message);
+			log.error('[addFriend] Info=\'addFriend failed\' error=' + error.message);
 			res.error(error.message);
 		}); 
 	
@@ -217,7 +217,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
 
 Parse.Cloud.define('searchFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	console.log('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
+	log.info('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
 
 	  var query = new Parse.Query("_User");
 	  query.startsWith("username_lowercase", req.params.searchTerm);
@@ -231,7 +231,7 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 
 Parse.Cloud.define('setOwnersChanges', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	console.log('[setOwnersChanges] Info=\'Running cloud code\' petId=' + req.params.petId + ' changeList=' + req.params.changeList);
+	log.info('[setOwnersChanges] Info=\'Running cloud code\' petId=' + req.params.petId + ' changeList=' + req.params.changeList);
 	
 	var Pet = Parse.Object.extend('Pet');
 	var User = Parse.Object.extend('_User');
@@ -248,11 +248,11 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 		
 		relationPets = user.relation('friendPets');
 		if(change.isFeeder){
-			console.log('[setFeedersChanges] Info=\'Adding pet to list\'');
+			log.debug('[setFeedersChanges] Info=\'Adding pet to list\'');
 			relationPets.add(pet);
 			relationFriends.add(user);
 		} else {
-			console.log('[setFeedersChanges] Info=\'Removing pet from list\'');
+			log.debug('[setFeedersChanges] Info=\'Removing pet from list\'');
 			relationPets.remove(pet);
 			relationFriends.remove(user);
 		}
@@ -262,10 +262,10 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 	
 	
 	Parse.Object.saveAll(toSave).then(function(result) {
-		console.log('[addFriend] Info=\'setFeedersChanges complete\'');
+		log.debug('[addFriend] Info=\'setFeedersChanges complete\'');
 		res.success('OK');
 	}, function(error) {
-		console.log('[addFriend] Info=\'setFeedersChanges failed\' error=' + error.message);
+		log.error('[addFriend] Info=\'setFeedersChanges failed\' error=' + error.message);
 		res.error(error.message);
 	}); 
 });
@@ -273,7 +273,7 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 
 Parse.Cloud.define('getPosts', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	console.log('[getPosts] Info=\'Running cloud code\' userId=' + req.params.userId + ' startPost=' + req.params.startPost + ' numPosts=' + req.params.numPosts);
+	log.info('[getPosts] Info=\'Running cloud code\' userId=' + req.params.userId + ' startPost=' + req.params.startPost + ' numPosts=' + req.params.numPosts);
 	
 	
 	var User = Parse.Object.extend('_User');

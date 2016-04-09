@@ -15,28 +15,48 @@ function propagatePost(post){
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
 	post.get('causingUser').relation('posts').add(post);
 
-	//show it to the causing user's friends
-	var relation = post.get('causingUser').relation('friends');
-	var query = relation.query();
+	try{
+		//show it to the causing user's friends
+		var relation = post.get('causingUser').relation('friends');
+		var query = relation.query();
+	} catch (e){
+		log.error('[propagatePost] Info=\'Failed to get friends relation\' error=' + e.message);
+		return Parse.Promise.error(e);
+	}
 
 	return query.find().then(function(results){
 		results.forEach(function(friend){
-			toSave.push(friend);
-			friend.relation('posts').add(post);
+			try{
+				toSave.push(friend);
+				friend.relation('posts').add(post);
+			} catch (e){
+				log.error('[propagatePost] Info=\'Failed to send to friends\' error=' + e.message);
+				return Parse.Promise.error(e);
+			}
 		});
 
 		//show it to all the owners of the about pet
 		if(post.get('aboutPet')){
-			relation = post.get('aboutPet').relation('owners');
-			query = relation.query();
+			try{
+				relation = post.get('aboutPet').relation('owners');
+				query = relation.query();
+			} catch (e){
+				log.error('[propagatePost] Info=\'Failed to get owners relation\' error=' + e.message);
+				return Parse.Promise.error(e);
+			}
 			return query.find();
 		} else {
 			return Parse.Object.saveAll(toSave);
 		}
 	}).then(function(results){
 		results.forEach(function(owner){
-			toSave.push(owner);
-			owner.relation('posts').add(post);
+			try{
+				toSave.push(owner);
+				owner.relation('posts').add(post);
+			} catch (e){
+				log.error('[propagatePost] Info=\'Failed to send to owners\' error=' + e.message);
+				return Parse.Promise.error(e);
+			}
 		});
 
 		return Parse.Object.saveAll(toSave);
@@ -47,13 +67,13 @@ function propagatePost(post){
 function publishFedPet(post, queueItem){
 	log.info('[publishFedPet] Info=\'Processing object\'');
 	log.debug('[publishFedPet] queueItem=%j', queueItem)
-	return Parse.Promise.error('no');
+
 	try{
 		post.set('type', 'fedPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
 	} catch (e){
-		log.debug('[publishFedPet] Info=\'Failed to set post properties\'');
+		log.error('[publishFedPet] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
 	}
 
@@ -69,9 +89,14 @@ function publishNewPetPhoto(post, queueItem){
 	log.info('[publishNewPetPhoto] Info=\'Processing object\'');
 	log.debug('[publishNewPetPhoto] queueItem=%j', queueItem)
 
-	post.set('type', 'newPetPhoto');
-	post.set('title', queueItem.get('causingUser').get('displayName') + ' added a new photo of ' + queueItem.get('aboutPet').get('name'));
-	post.set('image', queueItem.get('photo'));
+	try{
+		post.set('type', 'newPetPhoto');
+		post.set('title', queueItem.get('causingUser').get('displayName') + ' added a new photo of ' + queueItem.get('aboutPet').get('name'));
+		post.set('image', queueItem.get('photo'));	
+	} catch (e){
+		log.error('[publishNewPetPhoto] Info=\'Failed to set post properties\' error=' + e.message);
+		return Parse.Promise.error(e);
+	}
 
 	return post.save().then(function(post){
 		log.debug('[publishNewPetPhoto] Info=\'Saved post\'');
@@ -99,13 +124,18 @@ function processPublishQueue(){
 				queueItem.increment('retries');
 				queueItem.save();
 			}
-			console.log('[processPublishQueue] Info=\'Processing post\' type=' + queueItem.get('type'));
+			log.info('[processPublishQueue] Info=\'Processing post\' type=' + queueItem.get('type') + 'retries=' + queueItem.get('retries'));
 
-			var Post = Parse.Object.extend('Post');
-			var post = new Post();
-			post.set('numberPats', 0);
-			post.set('causingUser', queueItem.get('causingUser'));
-			post.set('aboutPet', queueItem.get('aboutPet'));
+			try{
+				var Post = Parse.Object.extend('Post');
+				var post = new Post();
+				post.set('numberPats', 0);
+				post.set('causingUser', queueItem.get('causingUser'));
+				post.set('aboutPet', queueItem.get('aboutPet'));
+			} catch (e){
+				log.error('[processPublishQueue] Info=\'Failed to set post properties\' error=' + e.message);
+				return; //try next queue item
+			}
 
 			switch(queueItem.get('type')){
 				case 'newPetPhoto':

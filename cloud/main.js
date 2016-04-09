@@ -98,6 +98,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	user.set('username', req.params.username);
 	user.set('username_lowercase', req.params.username.toLowerCase()); //for searching
 	user.set('password', req.params.password);
+	user.set('tagline', '');
 	promises.push(user.signUp());
 
 	var Post = Parse.Object.extend('Post');

@@ -3,16 +3,44 @@ var log = require('loglevel');
 
 log.setLevel('debug');
 
-Parse.Cloud.beforeSave('Pet', function(req, res) 
+//==============================
+//beforeSave
+Parse.Cloud.beforeSave(Parse.User, function(req, res) 
 {
-	var dirtyKeys = req.object.dirtyKeys();
-	log.info('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
-
-	req.object.set('lastDirtyKeys', dirtyKeys);
+	try{
+		var dirtyKeys = req.object.dirtyKeys();
+		log.info('[beforeSave User] Info=\'User\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
+		for (var i = 0; i < dirtyKeys.length; ++i) {
+			if(dirtyKeys[i]=='displayName'){
+				req.object.set('displayName_lowercase', req.object.get('displayName').toLowerCase());
+			}
+		}
+	} catch (e){
+		log.error('[beforeSave User] Info=\'Failed to set dirtyKeys for new pet\' error=' + e.message);
+	}
+	//either way, return success to the user
 	res.success();
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
 });
 
+Parse.Cloud.beforeSave('Pet', function(req, res) 
+{
+	try{
+		var dirtyKeys = req.object.dirtyKeys();
+		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
+		req.object.set('lastDirtyKeys', dirtyKeys);
+	} catch (e){
+		log.error('[beforeSave Pet] Info=\'Failed to set dirtyKeys for new pet\' error=' + e.message);
+	}
+	//either way, return success to the user
+	res.success();
+	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
+});
+
+//==============================
+
+//==============================
+//afterSave
 Parse.Cloud.afterSave('Pet', function(req) 
 {
 	//first check to see if it's a brand new pet :3
@@ -87,6 +115,8 @@ Parse.Cloud.afterSave('FeedingLog', function(req)
 	queueItem.save();
 });
 
+//==============================
+
 Parse.Cloud.define('checkPassword', function(request, response) 
 {
     var password = request.params.password;
@@ -119,7 +149,9 @@ Parse.Cloud.define('signUp', function(req, res) {
 	var User = Parse.Object.extend('_User');
 	var user = new User();
 	user.set('username', req.params.username);
+	user.set('displayName', req.params.username);
 	user.set('username_lowercase', req.params.username.toLowerCase()); //for searching
+	user.set('displayName_lowercase', req.params.username.toLowerCase()); //for searching
 	user.set('password', req.params.password);
 	user.set('tagline', '');
 	promises.push(user.signUp());
@@ -244,8 +276,12 @@ Parse.Cloud.define('searchFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	log.info('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
 
-	  var query = new Parse.Query("_User");
-	  query.startsWith("username_lowercase", req.params.searchTerm);
+	  var queryUsername = new Parse.Query("_User");
+	  queryUsername.startsWith("username_lowercase", req.params.searchTerm);
+	  var queryDisplayName = new Parse.Query("_User");
+	  queryDisplayName.startsWith("displayName_lowercase", req.params.searchTerm);
+
+	  var query = Parse.Query.or(queryUsername, queryDisplayName);
 
 	query.find().then(function(results){
 			res.success(results);

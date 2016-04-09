@@ -110,7 +110,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	post.set('numberPats', 0);
 	promises.push(post.save());
 
-	Parse.Promises.when(promises).then(
+	Parse.Promise.when(promises).then(
 		function(results){
 			//then set some permissions on the user and private data
 			user.relation('posts').add(post);
@@ -128,7 +128,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 			promises.push(privateData.save());
 
 			//then save them both
-			return Parse.Promises.when(promises);
+			return Parse.Promise.when(promises);
 		}).then(
 		function(user){
 			log.debug('[signup] Info=\'Saved user\'');

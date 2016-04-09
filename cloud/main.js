@@ -84,46 +84,38 @@ Parse.Cloud.define('signUp', function(req, res) {
 	//ok to get password in the clear since we are running over https
 	log.info('[signUp] Info=\'Running cloud code\' username=' + req.params.username + ' password=' + req.params.password + ' email=' + req.params.email);
 
+	promises = [];
+
 	//email is private data
 	var PrivateData = Parse.Object.extend('PrivateData');
 	var privateData = new PrivateData();
 	privateData.set('email', req.params.email);
+	var acl = new Parse.ACL();
+	acl.setPublicReadAccess(false);
+	acl.setWriteAccess(user, true);
+	privateData.setACL(acl);
+	promises.push(privateData.save());
 
 	var User = Parse.Object.extend('_User');
 	var user = new User();
 	user.set('username', req.params.username);
 	user.set('username_lowercase', req.params.username.toLowerCase()); //for searching
 	user.set('password', req.params.password);
+	promises.push(user.signUp());
 
 	var Post = Parse.Object.extend('Post');
 	var post = new Post();
-
 	post.set('type', 'signUp');
 	post.set('title', 'Welcome to Doubledip!');
 	post.set('text', 'This is your activity feed, where you\'ll see everything happening on your network. \
 		Try adding a new pet in the Pets tab, or find your friends in the Friends tab.'
 		);
 	post.set('numberPats', 0);
+	promises.push(post.save());
 
-	post.save().then(
-		function(post){
+	Parse.Promises.when(promises).then(
+		function(results){
 			user.relation('posts').add(post);
-			return user.signUp() 
-		}).then(
-		function(user) {
-			log.debug('[signup] Info=\'Signup successful\' username=' + user.get('username') + ' password=' + user.get('password'));
-
-			var acl = new Parse.ACL();
-			acl.setPublicReadAccess(false);
-			acl.setWriteAccess(user, true);
-			privateData.setACL(acl);
-
-			return privateData.save();
-		}).then(
-		function(privateData) {
-			log.debug('[signup] Info=\'Saved privateData\'');
-			user.set('privateData', privateData);
-
 			var acl = new Parse.ACL();
 			acl.setPublicReadAccess(true);
 			acl.setWriteAccess(user, true);
@@ -131,10 +123,11 @@ Parse.Cloud.define('signUp', function(req, res) {
 
 			return user.save(null, {useMasterKey:true});
 		}).then(
-		function(user) {
+		function(user){
 			log.debug('[signup] Info=\'Saved user\'');
 			res.success(user);
-		}, function(error) {
+		}, 
+		function(error){
 			log.error('[signup] Info=\'Signup failed\' error=' + error.message);
 			res.error(error.message);
 		});

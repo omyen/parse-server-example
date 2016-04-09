@@ -47,14 +47,14 @@ function propagatePost(post){
 function publishFedPet(post, queueItem){
 	log.info('[publishFedPet] Info=\'Processing object\'');
 	log.debug('[publishFedPet] queueItem=%j', queueItem)
-	return ParsePromise.error(e);
+	return Parse.Promise.error(e);
 	try{
 		post.set('type', 'fedPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
 	} catch (e){
 		log.debug('[publishFedPet] Info=\'Failed to set post properties\'');
-		return ParsePromise.error(e);
+		return Parse.Promise.error(e);
 	}
 
 	return post.save().then(function(post){

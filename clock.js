@@ -47,7 +47,7 @@ function propagatePost(post){
 function publishFedPet(post, queueItem){
 	log.info('[publishFedPet] Info=\'Processing object\'');
 	log.debug('[publishFedPet] queueItem=%j', queueItem)
-	return Parse.Promise.error(e);
+	return Parse.Promise.error('no');
 	try{
 		post.set('type', 'fedPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));

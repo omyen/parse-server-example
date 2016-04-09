@@ -85,6 +85,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	log.info('[signUp] Info=\'Running cloud code\' username=' + req.params.username + ' password=' + req.params.password + ' email=' + req.params.email);
 
 	promises = [];
+	//first save the private data, the user, and the initial post
 
 	//email is private data
 	var PrivateData = Parse.Object.extend('PrivateData');
@@ -111,7 +112,9 @@ Parse.Cloud.define('signUp', function(req, res) {
 
 	Parse.Promises.when(promises).then(
 		function(results){
+			//then set some permissions on the user and private data
 			user.relation('posts').add(post);
+			user.set('privateData', privateData);
 			var acl = new Parse.ACL();
 			acl.setPublicReadAccess(true);
 			acl.setWriteAccess(user, true);
@@ -124,6 +127,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 			privateData.setACL(acl);
 			promises.push(privateData.save());
 
+			//then save them both
 			return Parse.Promises.when(promises);
 		}).then(
 		function(user){

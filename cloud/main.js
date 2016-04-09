@@ -1,4 +1,4 @@
-require('log-buffer');
+//require('log-buffer');
 var log = require('loglevel');
 
 log.setLevel('debug');

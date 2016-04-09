@@ -1,4 +1,4 @@
-require('log-buffer');
+//require('log-buffer');
 
 var Parse = require('parse/node');
 Parse.initialize(process.env.APP_ID, '', process.env.MASTER_KEY); //middle var is js key - null

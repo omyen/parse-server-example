@@ -112,26 +112,27 @@ Parse.Cloud.define('signUp', function(req, res) {
 
 	Parse.Promise.when(promises).then(
 		function(results){
+			log.debug('[signup] Info=\'Saved user, privateData, initial post\'');
 			//then set some permissions on the user and private data
 			user.relation('posts').add(post);
 			user.set('privateData', privateData);
-			var acl = new Parse.ACL();
-			acl.setPublicReadAccess(true);
-			acl.setWriteAccess(user, true);
-			user.setACL(acl);
-			promises = [user.save(null, {useMasterKey:true})];
+			var aclUser = new Parse.ACL();
+			aclUser.setPublicReadAccess(true);
+			aclUser.setWriteAccess(user, true);
+			user.setACL(aclUser);
+			promises = [user.save()];
 
-			var acl = new Parse.ACL();
-			acl.setPublicReadAccess(false);
-			acl.setWriteAccess(user, true);
-			privateData.setACL(acl);
+			var aclPrivate = new Parse.ACL();
+			aclPrivate.setPublicReadAccess(false);
+			aclPrivate.setWriteAccess(user, true);
+			privateData.setACL(aclPrivate);
 			promises.push(privateData.save());
 
 			//then save them both
 			return Parse.Promise.when(promises);
 		}).then(
-		function(user){
-			log.debug('[signup] Info=\'Saved user\'');
+		function(results){
+			log.debug('[signup] Info=\'Success\'');
 			res.success(user);
 		}, 
 		function(error){

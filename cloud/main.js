@@ -1,12 +1,14 @@
 require('log-buffer');
+var log = require('loglevel');
+
+log.setLevel('debug');
 
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
 	var dirtyKeys = req.object.dirtyKeys();
-	//console.log('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
-	//why can't i just set this directly?
+	log.debug('[beforeSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
+
 	req.object.set('lastDirtyKeys', dirtyKeys);
-	//req.object.set('lastTouchedUser', Parse.User.current());
 	res.success();
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
 });
@@ -14,7 +16,12 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 Parse.Cloud.afterSave('Pet', function(req) 
 {
     var dirtyKeys = req.object.get('lastDirtyKeys');
-	console.log('[afterSave] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
+    if(!dirtyKeys) {
+    	log.error('[afterSave Pet] Info=\'No dirtyKeys\'');
+		return; 
+ 	} 
+
+	log.debug('[afterSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
 
 	var toSave = [];
 
@@ -22,7 +29,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 		var dirtyKey = dirtyKeys[i];
 		switch(dirtyKey){
 			case 'profilePhoto':
-				console.log('[afterSave] Info=\'Pet profilePhoto is dirty\'');
+				log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty\'');
 				//profilePhoto is the latest photo
 				var PublishQueue = Parse.Object.extend('PublishQueue');
 				var queueItem = new PublishQueue;
@@ -45,7 +52,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 Parse.Cloud.afterSave('FeedingLog', function(req) 
 {
-	console.log('[afterSave] Info=\'FeedingLog\'');
+	log.debug('[afterSave FeedingLog] Info=\'FeedingLog\'');
     var PublishQueue = Parse.Object.extend('PublishQueue');
 	var queueItem = new PublishQueue;
 

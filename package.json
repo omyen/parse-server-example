@@ -13,6 +13,7 @@
     "express": "~4.11.x",
     "kerberos": "~0.0.x",
     "log-buffer": "0.0.3",
+    "loglevel": "^1.4.0",
     "parse": "~1.8.0",
     "parse-server": "~2.2.6"
   },

@@ -28,59 +28,62 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res)
 
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
+	var pet = req.object;
 	//first check to see if it's a brand new pet :3
-	if(!req.object.existed()){
+	if(!pet.existed()){
 		try{
-			req.object.set('numberPhotosAdded', 0);
-			req.object.set('numberFeeds', 0);
-			req.object.set('numberLifetimePats', 0);
-			req.object.set('numberMaxPatsOnPost', 0);
+			pet.set('numberPhotosAdded', 0);
+			pet.set('numberFeeds', 0);
+			pet.set('numberLifetimePats', 0);
+			pet.set('numberMaxPatsOnPost', 0);
 
-			req.object.set('numberPhotosAddedToday', 0);
-			req.object.set('numberFeedsToday', 0);
+			pet.set('numberPhotosAddedToday', 0);
+			pet.set('numberFeedsToday', 0);
 		} catch (e){
 			log.error('[beforeSave Pet] Info=\'Failed to set properties for new pet\' error=' + e.message);
 		}
 		return;
 	}
 
+	//todo jump out if only dailes were reset
+
 
 
 	try{
-		var dirtyKeys = req.object.dirtyKeys();
+		var dirtyKeys = pet.dirtyKeys();
 		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
-		req.object.set('lastDirtyKeys', dirtyKeys);
+		pet.set('lastDirtyKeys', dirtyKeys);
 
 		//collect info for XP
 		for (var i = 0; i < dirtyKeys.length; ++i) {
 			var dirtyKey = dirtyKeys[i];
 			switch(dirtyKey){
 				case 'profilePhoto':
-					log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty - giving XP\'');
+					log.debug('[beforeSave Pet] Info=\'Pet profilePhoto is dirty - giving XP\'');
 					try{
 						if(pet.get('numberPhotosAddedToday')<=NEW_PHOTOS_PER_DAY){
 							pet.increment('numberPhotosAdded');
 							pet.increment('numberPhotosAddedToday');
 						} else {
-							log.debug('[afterSave Pet] Info=\'Too many new photos today, no xp\'');
+							log.debug('[beforeSave Pet] Info=\'Too many new photos today, no xp\'');
 						}
 					} catch (e){
-						log.error('[afterSave Pet] Info=\'Failed to set XP for profilePhoto update\' error=' + e.message);
+						log.error('[beforeSave Pet] Info=\'Failed to set XP for profilePhoto update\' error=' + e.message);
 						return; 
 					}
 					break;
 
 				case 'feedingLogs':
-					log.debug('[afterSave Pet] Info=\'Pet feedingLogs is dirty - giving XP\'');
+					log.debug('[beforeSave Pet] Info=\'Pet feedingLogs is dirty - giving XP\'');
 					try{
 						if(pet.get('numberFeedsToday')<=NEW_FEEDS_PER_DAY){
 							pet.increment('numberFeeds');
 							pet.increment('numberFeedsToday');
 						} else {
-							log.debug('[afterSave Pet] Info=\'Too many feeds today, no xp\'');
+							log.debug('[beforeSave Pet] Info=\'Too many feeds today, no xp\'');
 						}
 					} catch (e){
-						log.error('[afterSave Pet] Info=\'Failed to set XP for feeds update\' error=' + e.message);
+						log.error('[beforeSave Pet] Info=\'Failed to set XP for feeds update\' error=' + e.message);
 						return; 
 					}
 					break;
@@ -103,7 +106,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 //==============================
 //afterSave
 Parse.Cloud.afterSave('Pet', function(req) 
-{
+{	
 	//first check to see if it's a brand new pet :3
 	if(!req.object.existed()){
 		try{

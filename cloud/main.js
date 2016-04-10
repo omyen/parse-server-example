@@ -46,7 +46,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 		} catch (e){
 			log.error('[beforeSave Pet] Info=\'Failed to set properties for new pet\' error=' + e.message);
 		}
-		return;
+		res.success();
 	}
 
 	//todo jump out if only dailes were reset

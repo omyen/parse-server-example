@@ -231,7 +231,7 @@ new CronJob({
 });
 
 new CronJob({
-  cronTime: "15 * * * * *",//15 seconds after every minute
+  cronTime: "15 1 0 * * *",//15 seconds after minute one of hour 0 of every day
   onTick: resetXPDailies,
   start: true,
   timeZone: "America/Los_Angeles"

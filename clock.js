@@ -126,6 +126,8 @@ function publishNewPet(post, queueItem){
 
 
 function processPublishQueue(){
+	log.info('[processPublishQueue] Info=\'Running\'');
+
 	var query = new Parse.Query('PublishQueue');
 	query.include('savedObject');
 	query.include('causingUser');
@@ -190,6 +192,8 @@ function processPublishQueue(){
 }
 
 function resetXPDailies(){
+	log.info('[resetXPDailies] Info=\'Running\'');
+
 	var query = new Parse.Query('Pet');
 
 	var toSave = [];
@@ -201,7 +205,7 @@ function resetXPDailies(){
 				pets[i].set('numberFeedsToday', 0);
 				toSave.push(pets[i]);
 			} catch(e){
-				log.error('[processPublishQueue] Info=\'Failed to reset dailies for pet\' error=' + e.message);
+				log.error('[resetXPDailies] Info=\'Failed to reset dailies for pet\' error=' + e.message);
 				continue;
 			}
 		}

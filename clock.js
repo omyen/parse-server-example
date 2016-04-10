@@ -201,6 +201,7 @@ function resetXPDailies(){
 	query.find().then(function(pets){
 		for (var i = 0; i < pets.length; ++i) {
 			try{
+				log.debug('[resetXPDailies] Info=\'Resetting dailies for pet\' pet=' + pets[i].get('name'));
 				pets[i].set('numberPhotosAddedToday', 0);
 				pets[i].set('numberFeedsToday', 0);
 				toSave.push(pets[i]);
@@ -213,6 +214,7 @@ function resetXPDailies(){
 		log.error('[resetXPDailies] Info=\'Couldn\'t retrieve pets to reset dailies\' error=' + error.message);
 	});
 
+	log.debug('[resetXPDailies] Info=\'Saving pets\' toSave.length=' + toSave.length);
 	Parse.Object.saveAll(toSave);
 }
 

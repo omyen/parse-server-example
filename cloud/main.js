@@ -151,12 +151,12 @@ Parse.Cloud.afterSave('Pet', function(req)
 					queueItem.set('causingUser', req.user);
 					queueItem.set('aboutPet', pet);
 					queueItem.set('photo', pet.get('profilePhoto'));
+					toSave.push(queueItem);
 				} catch (e){
 					log.error('[afterSave Pet] Info=\'Failed to set post properties for profilePhoto update\' error=' + e.message);
 					return; 
 				}
 
-				toSave.push(queueItem);
 				break;
 			case 'lastFeedingLog':
 				log.debug('[afterSave Pet] Info=\'Pet lastFeedingLog is dirty - queueing post\'');
@@ -176,18 +176,18 @@ Parse.Cloud.afterSave('Pet', function(req)
 					queueItem.set('causingUser', req.user);
 					queueItem.set('aboutPet', pet);
 					queueItem.set('photo', pet.get('profilePhoto'));
+					toSave.push(queueItem);
 				} catch (e){
 					log.error('[afterSave Pet] Info=\'Failed to set post properties for lastFeedingLog update\' error=' + e.message);
 					return; 
 				}
-
-				toSave.push(queueItem);
+				
 				break;
 			default:
 				break;
 		}
 	}
-
+	log.debug('[afterSave Pet] Info=\'Saving posts\' toSave.length=' + toSave.length);
 	Parse.Object.saveAll(toSave)
 });
 

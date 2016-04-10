@@ -100,6 +100,18 @@ function publishNewPetPhoto(post, queueItem){
 
 	return post.save().then(function(post){
 		log.debug('[publishNewPetPhoto] Info=\'Saved post\'');
+		//also save the post as a field in the photo so we can link the pats/likes
+		try{
+			queueItem.get('photo').set('relatedPost', post);
+			queueItem.get('photo').save().then(function(photo){
+				log.debug('[publishNewPetPhoto] Info=\'Saved photo\'');
+			}, function(error){
+				log.error('[publishNewPetPhoto] Info=\'Failed to save photo\' error=' + error.message);
+			});
+		} catch(e){
+			log.error('[publishNewPetPhoto] Info=\'Failed to set relatedPost on photo\' error=' + e.message);
+		}
+
 		return propagatePost(post);
 	});
 

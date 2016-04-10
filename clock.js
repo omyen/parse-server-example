@@ -210,12 +210,13 @@ function resetXPDailies(){
 				continue;
 			}
 		}
+		log.debug('[resetXPDailies] Info=\'Saving pets\' toSave.length=' + toSave.length);
+		Parse.Object.saveAll(toSave);
 	}, function(error){
 		log.error('[resetXPDailies] Info=\'Couldn\'t retrieve pets to reset dailies\' error=' + error.message);
 	});
 
-	log.debug('[resetXPDailies] Info=\'Saving pets\' toSave.length=' + toSave.length);
-	Parse.Object.saveAll(toSave);
+	
 }
 
 //======================

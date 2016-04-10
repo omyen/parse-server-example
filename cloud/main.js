@@ -38,6 +38,11 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 			pet.set('numberLifetimePats', 0);
 			pet.set('numberMaxPatsOnPost', 0);
 
+			pet.set('levelPhotos', 1);
+			pet.set('levelFeeds', 1);
+			pet.set('levelPats', 1);
+			pet.set('levelMaxPats', 1);
+
 			pet.set('numberPhotosAddedToday', 0);
 			pet.set('numberFeedsToday', 0);
 

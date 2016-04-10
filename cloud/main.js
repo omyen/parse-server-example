@@ -135,6 +135,8 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 	log.info('[afterSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' pet=' + pet.get('name') + 'petId=' + pet.id);
 
+	var toSave = [];
+
 	//collect info for posts
 	for (var i = 0; i < dirtyKeys.length; ++i) {
 		var dirtyKey = dirtyKeys[i];

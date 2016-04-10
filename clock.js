@@ -189,13 +189,43 @@ function processPublishQueue(){
 	});
 }
 
+function resetXPDailies(){
+	var query = new Parse.Query('Pet');
+
+	var toSave = [];
+
+	query.find().then(function(pets){
+		for (var i = 0; i < pets.length; ++i) {
+			try{
+				pets[i].set('numberPhotosAddedToday', 0);
+				pets[i].set('numberFeedsToday', 0);
+				toSave.push(pets[i]);
+			} catch(e){
+				log.error('[processPublishQueue] Info=\'Failed to reset dailies for pet\' error=' + e.message);
+				continue;
+			}
+		}
+	}, function(error){
+		log.error('[resetXPDailies] Info=\'Couldn\'t retrieve pets to reset dailies\' error=' + error.message);
+	});
+
+	Parse.Object.saveAll(toSave);
+}
 
 //======================
 //set up cron job
 var CronJob = require('cron').CronJob;
+
 new CronJob({
   cronTime: "15 * * * * *",//15 seconds after every minute
   onTick: processPublishQueue,
+  start: true,
+  timeZone: "America/Los_Angeles"
+});
+
+new CronJob({
+  cronTime: "15 * * * * *",//15 seconds after every minute
+  onTick: resetXPDailies,
   start: true,
   timeZone: "America/Los_Angeles"
 });

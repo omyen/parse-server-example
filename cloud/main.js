@@ -3,6 +3,9 @@ var log = require('loglevel');
 
 log.setLevel('debug');
 
+var NEW_PHOTOS_PER_DAY = 5; //max number of new photos that will give xp per day
+var NEW_FEEDS_PER_DAY = 5; //max number of feeds that will give xp per day
+
 //==============================
 //beforeSave
 Parse.Cloud.beforeSave(Parse.User, function(req, res) 
@@ -25,12 +28,70 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res)
 
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
+	//first check to see if it's a brand new pet :3
+	if(!req.object.existed()){
+		try{
+			req.object.set('numberPhotosAdded', 0);
+			req.object.set('numberFeeds', 0);
+			req.object.set('numberLifetimePats', 0);
+			req.object.set('numberMaxPatsOnPost', 0);
+
+			req.object.set('numberPhotosAddedToday', 0);
+			req.object.set('numberFeedsToday', 0);
+		} catch (e){
+			log.error('[beforeSave Pet] Info=\'Failed to set properties for new pet\' error=' + e.message);
+		}
+		return;
+	}
+
+
+
 	try{
 		var dirtyKeys = req.object.dirtyKeys();
 		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
 		req.object.set('lastDirtyKeys', dirtyKeys);
+
+		//collect info for XP
+		for (var i = 0; i < dirtyKeys.length; ++i) {
+			var dirtyKey = dirtyKeys[i];
+			switch(dirtyKey){
+				case 'profilePhoto':
+					log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty - giving XP\'');
+					try{
+						if(pet.get('numberPhotosAddedToday')<=NEW_PHOTOS_PER_DAY){
+							pet.increment('numberPhotosAdded');
+							pet.increment('numberPhotosAddedToday');
+						} else {
+							log.debug('[afterSave Pet] Info=\'Too many new photos today, no xp\'');
+						}
+					} catch (e){
+						log.error('[afterSave Pet] Info=\'Failed to set XP for profilePhoto update\' error=' + e.message);
+						return; 
+					}
+					break;
+
+				case 'feedingLogs':
+					log.debug('[afterSave Pet] Info=\'Pet feedingLogs is dirty - giving XP\'');
+					try{
+						if(pet.get('numberFeedsToday')<=NEW_FEEDS_PER_DAY){
+							pet.increment('numberFeeds');
+							pet.increment('numberFeedsToday');
+						} else {
+							log.debug('[afterSave Pet] Info=\'Too many feeds today, no xp\'');
+						}
+					} catch (e){
+						log.error('[afterSave Pet] Info=\'Failed to set XP for feeds update\' error=' + e.message);
+						return; 
+					}
+					break;
+
+				default:
+					break;
+			}
+		}
+
 	} catch (e){
-		log.error('[beforeSave Pet] Info=\'Failed to set dirtyKeys for new pet\' error=' + e.message);
+		log.error('[beforeSave Pet] Info=\'Failed to set dirtyKeys and XP for pet\' error=' + e.message);
 	}
 	//either way, return success to the user
 	res.success();
@@ -60,8 +121,9 @@ Parse.Cloud.afterSave('Pet', function(req)
 		return;
 	}
 
+	var pet = req.object;
 	//otherwise let's see what changed
-    var dirtyKeys = req.object.get('lastDirtyKeys');
+    var dirtyKeys = pet.get('lastDirtyKeys');
     if(!dirtyKeys) {
     	log.error('[afterSave Pet] Info=\'No dirtyKeys\'');
 		return; 
@@ -69,13 +131,12 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 	log.info('[afterSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
 
-	var toSave = [];
-
+	//collect info for posts
 	for (var i = 0; i < dirtyKeys.length; ++i) {
 		var dirtyKey = dirtyKeys[i];
 		switch(dirtyKey){
 			case 'profilePhoto':
-				log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty\'');
+				log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty - queueing post\'');
 				//profilePhoto is the latest photo
 				try{
 					var PublishQueue = Parse.Object.extend('PublishQueue');
@@ -84,8 +145,8 @@ Parse.Cloud.afterSave('Pet', function(req)
 					queueItem.set('type', 'newPetPhoto');
 					queueItem.set('req', req);
 					queueItem.set('causingUser', req.user);
-					queueItem.set('aboutPet', req.object);
-					queueItem.set('photo', req.object.get('profilePhoto'));
+					queueItem.set('aboutPet', pet);
+					queueItem.set('photo', pet.get('profilePhoto'));
 				} catch (e){
 					log.error('[afterSave Pet] Info=\'Failed to set post properties for profilePhoto update\' error=' + e.message);
 					return; 

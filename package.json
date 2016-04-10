@@ -15,7 +15,7 @@
     "log-buffer": "0.0.3",
     "loglevel": "^1.4.0",
     "parse": "~1.8.0",
-    "parse-server": "~2.2.2"
+    "parse-server": "ParsePlatform/parse-server"
   },
   "scripts": {
     "start": "node index.js"

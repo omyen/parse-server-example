@@ -270,12 +270,12 @@ Parse.Cloud.afterSave('Post', function(req)
 		return; 
  	} 
 
-	log.info('[afterSave Post] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
+	log.info('[afterSave Post] Info=\'Post\' dirtyKeysLength=' + dirtyKeys.length);
 	for (var i = 0; i < dirtyKeys.length; ++i) {
 		var dirtyKey = dirtyKeys[i];
 		switch(dirtyKey){
-			case 'lastPostTotalPats':
-				log.debug('[afterSave Post] Info=\'Post lastPostTotalPats is dirty - giving xp\'');
+			case 'numberPats':
+				log.debug('[afterSave Post] Info=\'Post numberPats is dirty - giving xp\'');
 				//profilePhoto is the latest photo
 				try{
 					var pet = post.get('aboutPet');
@@ -283,7 +283,7 @@ Parse.Cloud.afterSave('Post', function(req)
 					pet.increment('lifetimePats'); //for stats
 					pet.save();
 				} catch (e){
-					log.error('[afterSave Post] Info=\'Failed to give xp for lastPostTotalPats\' error=' + e.message);
+					log.error('[afterSave Post] Info=\'Failed to give xp for numberPats\' error=' + e.message);
 					return; 
 				}
 

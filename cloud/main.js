@@ -228,7 +228,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 					queueItem.set('type', 'fedPet');
 					queueItem.set('req', req);
-					queueItem.set('causingUser', pet.get('lastFeedingLog').get('fedBy'));
+					queueItem.set('causingUser', pet.get('lastFeedingUser'));
 					queueItem.set('aboutPet', pet);
 					queueItem.set('photo', pet.get('profilePhoto'));
 					toSave.push(queueItem);
@@ -409,6 +409,7 @@ Parse.Cloud.define('feedPet', function(req, res) {
 			var relation = mPet.relation('feedingLogs');
 			relation.add(feedingLog);
 			mPet.set('lastFeedingLog', feedingLog);
+			mPet.set('lastFeedingUser', user);
 			return mPet.save();
 		}).then(function(pet){
 			log.debug('[feedPet] Info=\'Saved pet successfully\'');

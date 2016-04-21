@@ -35,13 +35,16 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 		try{
 			pet.set('numberPhotosAdded', 0);
 			pet.set('numberFeeds', 0);
-			pet.set('numberLifetimePats', 0);
-			pet.set('numberMaxPatsOnPost', 0);
+			pet.set('lifetimePats', 0);
+			pet.set('maxPatsOnPost', 0);
+			pet.set('maxOwners', 0);
 
 			pet.set('levelPhotos', 1);
 			pet.set('levelFeeds', 1);
 			pet.set('levelPats', 1);
 			pet.set('levelMaxPats', 1);
+			pet.set('levelLifetimePats', 1);
+			pet.set('levelMaxOwners', 1);
 
 			pet.set('numberPhotosAddedToday', 0);
 			pet.set('numberFeedsToday', 0);
@@ -93,6 +96,34 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 						}
 					} catch (e){
 						log.error('[beforeSave Pet] Info=\'Failed to set XP for feeds update\' error=' + e.message);
+						return; 
+					}
+					break;
+
+				case 'numOwners':
+					log.debug('[beforeSave Pet] Info=\'Pet numOwners is dirty - giving XP\'');
+					try{
+						if(pet.get('numOwners')>pet.get('maxOwners')){
+							pet.get('maxOwners') = pet.get('numOwners');
+						} else {
+							log.debug('[beforeSave Pet] Info=\'max owners unchanged\' numOwners=' + pet.get('numOwners') + ' maxOwners=' + pet.get('maxOwners'));
+						}
+					} catch (e){
+						log.error('[beforeSave Pet] Info=\'Failed to set XP for numOwners update\' error=' + e.message);
+						return; 
+					}
+					break;
+
+				case 'lastPostTotalPats':
+					log.debug('[beforeSave Pet] Info=\'Pet lastPostTotalPats is dirty - giving XP\'');
+					try{
+						if(pet.get('lastPostTotalPats')>pet.get('maxPatsOnPost')){
+							pet.get('maxPatsOnPost') = pet.get('lastPostTotalPats');
+						} else {
+							log.debug('[beforeSave Pet] Info=\'maxPatsOnPost unchanged\' lastPostTotalPats=' + pet.get('lastPostTotalPats') + ' maxPatsOnPost=' + pet.get('maxPatsOnPost'));
+						}
+					} catch (e){
+						log.error('[beforeSave Pet] Info=\'Failed to set XP for lastPostTotalPats update\' error=' + e.message);
 						return; 
 					}
 					break;

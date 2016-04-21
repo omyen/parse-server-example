@@ -20,7 +20,22 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res)
 			}
 		}
 	} catch (e){
-		log.error('[beforeSave User] Info=\'Failed to set dirtyKeys for new pet\' error=' + e.message);
+		log.error('[beforeSave User] Info=\'Failed to set displayname lowercase\' error=' + e.message);
+	}
+	//either way, return success to the user
+	res.success();
+	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
+});
+
+Parse.Cloud.beforeSave('Post', function(req, res) 
+{
+	var post = req.object;
+	try{
+		var dirtyKeys = post.dirtyKeys();
+		log.info('[beforeSave Post] Info=\'Post\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
+		post.set('lastDirtyKeys', dirtyKeys);
+	} catch (e){
+		log.error('[beforeSave Post] Info=\'Failed to set dirtyKeys and XP for post\' error=' + e.message);
 	}
 	//either way, return success to the user
 	res.success();

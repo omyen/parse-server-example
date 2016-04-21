@@ -104,7 +104,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 					log.debug('[beforeSave Pet] Info=\'Pet numOwners is dirty - giving XP\'');
 					try{
 						if(pet.get('numOwners')>pet.get('maxOwners')){
-							pet.get('maxOwners') = pet.get('numOwners');
+							pet.set('maxOwners', pet.get('numOwners'));
 						} else {
 							log.debug('[beforeSave Pet] Info=\'max owners unchanged\' numOwners=' + pet.get('numOwners') + ' maxOwners=' + pet.get('maxOwners'));
 						}
@@ -118,7 +118,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 					log.debug('[beforeSave Pet] Info=\'Pet lastPostTotalPats is dirty - giving XP\'');
 					try{
 						if(pet.get('lastPostTotalPats')>pet.get('maxPatsOnPost')){
-							pet.get('maxPatsOnPost') = pet.get('lastPostTotalPats');
+							pet.set('maxPatsOnPost',pet.get('lastPostTotalPats'));
 						} else {
 							log.debug('[beforeSave Pet] Info=\'maxPatsOnPost unchanged\' lastPostTotalPats=' + pet.get('lastPostTotalPats') + ' maxPatsOnPost=' + pet.get('maxPatsOnPost'));
 						}

@@ -52,7 +52,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 			pet.set('numberFeeds', 0);
 			pet.set('lifetimePats', 0);
 			pet.set('maxPatsOnPost', 0);
-			pet.set('maxOwners', 0);
+			pet.set('maxOwners', 1); //you always start with one
 
 			pet.set('levelPhotos', 1);
 			pet.set('levelFeeds', 1);
@@ -278,6 +278,9 @@ Parse.Cloud.afterSave('Post', function(req)
 				log.debug('[afterSave Post] Info=\'Post numberPats is dirty - giving xp\'');
 				//profilePhoto is the latest photo
 				try{
+					if(post.get('numberPats')==0){
+						continue;
+					}
 					var pet = post.get('aboutPet');
 					pet.set('lastPostTotalPats', post.get('numberPats')); //for stats
 					pet.increment('lifetimePats'); //for stats

@@ -203,7 +203,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 					queueItem.set('type', 'newPetPhoto');
 					queueItem.set('req', req);
-					queueItem.set('causingUser', req.user);
+					queueItem.set('causingUser', pet.get('administrator')); // only the admin can add photos
 					queueItem.set('aboutPet', pet);
 					queueItem.set('photo', pet.get('profilePhoto'));
 					toSave.push(queueItem);
@@ -228,7 +228,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 					queueItem.set('type', 'fedPet');
 					queueItem.set('req', req);
-					queueItem.set('causingUser', req.user);
+					queueItem.set('causingUser', pet.get('lastFeedingLog').get('fedBy'));
 					queueItem.set('aboutPet', pet);
 					queueItem.set('photo', pet.get('profilePhoto'));
 					toSave.push(queueItem);

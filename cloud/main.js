@@ -41,7 +41,6 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 			pet.set('levelPhotos', 1);
 			pet.set('levelFeeds', 1);
-			pet.set('levelPats', 1);
 			pet.set('levelMaxPats', 1);
 			pet.set('levelLifetimePats', 1);
 			pet.set('levelMaxOwners', 1);
@@ -244,6 +243,25 @@ Parse.Cloud.afterSave('FeedingLog', function(req)
 	// queueItem.set('aboutPet', req.object.get('petFed'));
 
 	// queueItem.save();
+});
+
+Parse.Cloud.afterSave('Post', function(req) 
+{
+	Parse.Cloud.useMasterKey();
+	var post = req.object;
+	var dirtyKeys = post.get('lastDirtyKeys');
+    if(!dirtyKeys) {
+    	log.error('[afterSave Post] Info=\'No dirtyKeys\'');
+		return; 
+ 	} 
+
+	log.info('[afterSave Post] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length);
+
+	var pet = post.get('aboutPet');
+	pet.set('lastPostTotalPats', post.get('numberPats')); //for stats
+	pet.increment('lifetimePats'); //for stats
+	pet.save();
+
 });
 
 //==============================

@@ -44,6 +44,7 @@ Parse.Cloud.beforeSave('Post', function(req, res)
 
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {
+	res.success();
 	var pet = req.object;
 	//first check to see if it's a brand new pet :3
 	if(!pet.existed()){

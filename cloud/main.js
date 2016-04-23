@@ -42,120 +42,120 @@ Parse.Cloud.beforeSave('Post', function(req, res)
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
 });
 
-Parse.Cloud.beforeSave('Pet', function(req, res) 
-{
-	var pet = req.object;
-	//first check to see if it's a brand new pet :3
-	if(!pet.existed()){
-		try{
-			pet.set('numberPhotosAdded', 0);
-			pet.set('numberFeeds', 0);
-			pet.set('lifetimePats', 0);
-			pet.set('maxPatsOnPost', 0);
-			pet.set('maxOwners', 1); //you always start with one
+// Parse.Cloud.beforeSave('Pet', function(req, res) 
+// {
+// 	var pet = req.object;
+// 	//first check to see if it's a brand new pet :3
+// 	if(!pet.existed()){
+// 		try{
+// 			pet.set('numberPhotosAdded', 0);
+// 			pet.set('numberFeeds', 0);
+// 			pet.set('lifetimePats', 0);
+// 			pet.set('maxPatsOnPost', 0);
+// 			pet.set('maxOwners', 1); //you always start with one
 
-			pet.set('levelPhotos', 1);
-			pet.set('levelFeeds', 1);
-			pet.set('levelMaxPats', 1);
-			pet.set('levelLifetimePats', 1);
-			pet.set('levelMaxOwners', 1);
+// 			pet.set('levelPhotos', 1);
+// 			pet.set('levelFeeds', 1);
+// 			pet.set('levelMaxPats', 1);
+// 			pet.set('levelLifetimePats', 1);
+// 			pet.set('levelMaxOwners', 1);
 
-			pet.set('numberPhotosAddedToday', 0);
-			pet.set('numberFeedsToday', 0);
+// 			pet.set('numberPhotosAddedToday', 0);
+// 			pet.set('numberFeedsToday', 0);
 
-			pet.set('xp', 0);
-			pet.set('level', 1);
+// 			pet.set('xp', 0);
+// 			pet.set('level', 1);
 
-			pet.set('coins', 0);
-		} catch (e){
-			log.error('[beforeSave Pet] Info=\'Failed to set properties for new pet\' error=' + e.message);
-		}
-		res.success();
-	}
+// 			pet.set('coins', 0);
+// 		} catch (e){
+// 			log.error('[beforeSave Pet] Info=\'Failed to set properties for new pet\' error=' + e.message);
+// 		}
+// 		res.success();
+// 	}
 
-	//todo jump out if only dailes were reset
+// 	//todo jump out if only dailes were reset
 
 
 
-	try{
-		var dirtyKeys = pet.dirtyKeys();
-		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
-		pet.set('lastDirtyKeys', dirtyKeys);
+// 	try{
+// 		var dirtyKeys = pet.dirtyKeys();
+// 		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
+// 		pet.set('lastDirtyKeys', dirtyKeys);
 
-		//collect info for XP
-		for (var i = 0; i < dirtyKeys.length; ++i) {
-			var dirtyKey = dirtyKeys[i];
-			switch(dirtyKey){
-				case 'profilePhoto':
-					log.debug('[beforeSave Pet] Info=\'Pet profilePhoto is dirty - giving XP\'');
-					try{
-						if(pet.get('numberPhotosAddedToday')<=NEW_PHOTOS_PER_DAY){
-							pet.increment('numberPhotosAdded');
-							pet.increment('numberPhotosAddedToday');
-						} else {
-							log.debug('[beforeSave Pet] Info=\'Too many new photos today, no xp\'');
-						}
-					} catch (e){
-						log.error('[beforeSave Pet] Info=\'Failed to set XP for profilePhoto update\' error=' + e.message);
-						return; 
-					}
-					break;
+// 		//collect info for XP
+// 		for (var i = 0; i < dirtyKeys.length; ++i) {
+// 			var dirtyKey = dirtyKeys[i];
+// 			switch(dirtyKey){
+// 				case 'profilePhoto':
+// 					log.debug('[beforeSave Pet] Info=\'Pet profilePhoto is dirty - giving XP\'');
+// 					try{
+// 						if(pet.get('numberPhotosAddedToday')<=NEW_PHOTOS_PER_DAY){
+// 							pet.increment('numberPhotosAdded');
+// 							pet.increment('numberPhotosAddedToday');
+// 						} else {
+// 							log.debug('[beforeSave Pet] Info=\'Too many new photos today, no xp\'');
+// 						}
+// 					} catch (e){
+// 						log.error('[beforeSave Pet] Info=\'Failed to set XP for profilePhoto update\' error=' + e.message);
+// 						return; 
+// 					}
+// 					break;
 
-				case 'lastFeedingLog':
-					log.debug('[beforeSave Pet] Info=\'Pet lastFeedingLog is dirty - giving XP\'');
-					try{
-						if(pet.get('numberFeedsToday')<=NEW_FEEDS_PER_DAY){
-							pet.increment('numberFeeds');
-							pet.increment('numberFeedsToday');
-						} else {
-							log.debug('[beforeSave Pet] Info=\'Too many feeds today, no xp\'');
-						}
-					} catch (e){
-						log.error('[beforeSave Pet] Info=\'Failed to set XP for feeds update\' error=' + e.message);
-						return; 
-					}
-					break;
+// 				case 'lastFeedingLog':
+// 					log.debug('[beforeSave Pet] Info=\'Pet lastFeedingLog is dirty - giving XP\'');
+// 					try{
+// 						if(pet.get('numberFeedsToday')<=NEW_FEEDS_PER_DAY){
+// 							pet.increment('numberFeeds');
+// 							pet.increment('numberFeedsToday');
+// 						} else {
+// 							log.debug('[beforeSave Pet] Info=\'Too many feeds today, no xp\'');
+// 						}
+// 					} catch (e){
+// 						log.error('[beforeSave Pet] Info=\'Failed to set XP for feeds update\' error=' + e.message);
+// 						return; 
+// 					}
+// 					break;
 
-				case 'numOwners':
-					log.debug('[beforeSave Pet] Info=\'Pet numOwners is dirty - giving XP\'');
-					try{
-						if(pet.get('numOwners')>pet.get('maxOwners')){
-							pet.set('maxOwners', pet.get('numOwners'));
-						} else {
-							log.debug('[beforeSave Pet] Info=\'max owners unchanged\' numOwners=' + pet.get('numOwners') + ' maxOwners=' + pet.get('maxOwners'));
-						}
-					} catch (e){
-						log.error('[beforeSave Pet] Info=\'Failed to set XP for numOwners update\' error=' + e.message);
-						return; 
-					}
-					break;
+// 				case 'numOwners':
+// 					log.debug('[beforeSave Pet] Info=\'Pet numOwners is dirty - giving XP\'');
+// 					try{
+// 						if(pet.get('numOwners')>pet.get('maxOwners')){
+// 							pet.set('maxOwners', pet.get('numOwners'));
+// 						} else {
+// 							log.debug('[beforeSave Pet] Info=\'max owners unchanged\' numOwners=' + pet.get('numOwners') + ' maxOwners=' + pet.get('maxOwners'));
+// 						}
+// 					} catch (e){
+// 						log.error('[beforeSave Pet] Info=\'Failed to set XP for numOwners update\' error=' + e.message);
+// 						return; 
+// 					}
+// 					break;
 
-				case 'lastPostTotalPats':
-					log.debug('[beforeSave Pet] Info=\'Pet lastPostTotalPats is dirty - giving XP\'');
-					try{
-						if(pet.get('lastPostTotalPats')>pet.get('maxPatsOnPost')){
-							pet.set('maxPatsOnPost',pet.get('lastPostTotalPats'));
-						} else {
-							log.debug('[beforeSave Pet] Info=\'maxPatsOnPost unchanged\' lastPostTotalPats=' + pet.get('lastPostTotalPats') + ' maxPatsOnPost=' + pet.get('maxPatsOnPost'));
-						}
-					} catch (e){
-						log.error('[beforeSave Pet] Info=\'Failed to set XP for lastPostTotalPats update\' error=' + e.message);
-						return; 
-					}
-					break;
+// 				case 'lastPostTotalPats':
+// 					log.debug('[beforeSave Pet] Info=\'Pet lastPostTotalPats is dirty - giving XP\'');
+// 					try{
+// 						if(pet.get('lastPostTotalPats')>pet.get('maxPatsOnPost')){
+// 							pet.set('maxPatsOnPost',pet.get('lastPostTotalPats'));
+// 						} else {
+// 							log.debug('[beforeSave Pet] Info=\'maxPatsOnPost unchanged\' lastPostTotalPats=' + pet.get('lastPostTotalPats') + ' maxPatsOnPost=' + pet.get('maxPatsOnPost'));
+// 						}
+// 					} catch (e){
+// 						log.error('[beforeSave Pet] Info=\'Failed to set XP for lastPostTotalPats update\' error=' + e.message);
+// 						return; 
+// 					}
+// 					break;
 
-				default:
-					break;
-			}
-		}
+// 				default:
+// 					break;
+// 			}
+// 		}
 
-	} catch (e){
-		log.error('[beforeSave Pet] Info=\'Failed to set dirtyKeys and XP for pet\' error=' + e.message);
-	}
-	//either way, return success to the user
-	res.success();
-	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
-});
+// 	} catch (e){
+// 		log.error('[beforeSave Pet] Info=\'Failed to set dirtyKeys and XP for pet\' error=' + e.message);
+// 	}
+// 	//either way, return success to the user
+// 	res.success();
+// 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
+// });
 
 //==============================
 

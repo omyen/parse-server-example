@@ -65,6 +65,8 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 			pet.set('xp', 0);
 			pet.set('level', 1);
+
+			pet.set('coins', 0);
 		} catch (e){
 			log.error('[beforeSave Pet] Info=\'Failed to set properties for new pet\' error=' + e.message);
 		}

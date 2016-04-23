@@ -42,9 +42,13 @@ Parse.Cloud.beforeSave('Post', function(req, res)
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
 });
 
-Parse.Cloud.beforeSave('Pet', function(req, res) 
+Parse.Cloud.beforeSave('Test'), function(req, res)
 {
 	res.success();
+}
+
+Parse.Cloud.beforeSave('Pet', function(req, res) 
+{
 	var pet = req.object;
 	//first check to see if it's a brand new pet :3
 	if(!pet.existed()){

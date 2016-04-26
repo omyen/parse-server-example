@@ -5,6 +5,7 @@ var express = require('express');
 var ParseServer = require('parse-server').ParseServer;
 var path = require('path');
 var S3Adapter = require('parse-server').S3Adapter;
+var SimpleMailgunAdapter = require('parse-server/lib/Adapters/Email/SimpleMailgunAdapter');
 
 var databaseUri = process.env.DATABASE_URI || process.env.MONGOLAB_URI;
 
@@ -13,17 +14,24 @@ if (!databaseUri) {
 }
 
 var api = new ParseServer({
+  appName: 'DoubleDip',
   databaseURI: databaseUri,
   cloud: __dirname + '/cloud/main.js',
   appId: process.env.APP_ID || 'myAppId',
   masterKey: process.env.MASTER_KEY || 'myMasterKey', //Add your master key here. Keep it secret!
   serverURL: process.env.SERVER_URL,
+  publicServerURL: process.env.SERVER_URL,
   filesAdapter: new S3Adapter(
     process.env.S3_ACCESS_KEY,
     process.env.S3_SECRET_KEY,
     process.env.S3_BUCKET,
     {directAccess: false}
   ),
+  emailAdapter: SimpleMailgunAdapter({
+    apiKey: process.env.MAILGUN_API_KEY,
+    domain: process.env.MAILGUN_DOMAIN,
+    fromAddress: 'noreply@' + process.env.MAILGUN_DOMAIN
+  })
 });
 // Client-keys like the javascript key or the .NET key are not necessary with parse-server
 // If you wish you require them, you can set them as options in the initialization above:

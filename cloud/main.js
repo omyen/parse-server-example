@@ -438,8 +438,12 @@ Parse.Cloud.define('deleteFile', function(request, response)
 	            "X-Parse-Application-Id": process.env.APP_ID,
 	            "X-Parse-REST-API-Key" : process.env.APP_ID
 	        }
+	    }).then(function(result){
+	    	response.success(true);
+	    }, function(error){
+			response.error(error.message);
 	    });
-	    response.success(true);
+	    
 	} catch (e){
 		log.error('[deleteFile] Info=\'Error\' error=' + e.message);
 		response.error(e.message);

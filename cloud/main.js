@@ -323,7 +323,7 @@ Parse.Cloud.define('resetPassword', function(request, response)
     var username = request.params.username;
 
 	var queryUsername = new Parse.Query("_User");
-	queryUsername.equals("username", username);
+	queryUsername.equalTo("username", username);
 
 	queryUsername.find().then(function(results){
 		return Parse.User.requestPasswordReset(result[0].get('email'));

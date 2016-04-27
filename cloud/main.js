@@ -338,7 +338,7 @@ Parse.Cloud.define('resetPassword', function(request, response)
 		});	  
 	} catch (e){
 		log.error('[resetPassword] Info=\'Error\' error=' + e.message);
-		response.error(error.message);
+		response.error(e.message);
 	}
 });
 
@@ -363,7 +363,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 		});	  
 	} catch (e){
 		log.error('[signUp] Info=\'Error\' error=' + e.message);
-		res.error(error.message);
+		res.error(e.message);
 	}
 
 	promises = [];
@@ -428,9 +428,9 @@ Parse.Cloud.define('signUp', function(req, res) {
 
 Parse.Cloud.define('deleteFile', function(request, response) 
 {
-	log.debug('[deleteFile] Info=\'Running cloud code\' url=' + request.url);
+	log.debug('[deleteFile] Info=\'Running cloud code\' url=' + request.params.url);
 	try{
-	 	var imageURL =request.url;    
+	 	var imageURL =request.params.url;    
 		Parse.Cloud.httpRequest({
 	        method: 'DELETE',
 	        url: imageURL.substring(imageURL.lastIndexOf("/")+1),
@@ -442,7 +442,7 @@ Parse.Cloud.define('deleteFile', function(request, response)
 	    response.success(true);
 	} catch (e){
 		log.error('[deleteFile] Info=\'Error\' error=' + e.message);
-		response.error(error.message);
+		response.error(e.message);
 	}
 
 });

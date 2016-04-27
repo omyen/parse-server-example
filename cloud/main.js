@@ -433,7 +433,7 @@ Parse.Cloud.define('deleteFile', function(request, response)
         method: 'DELETE',
         url: imageURL.substring(imageURL.lastIndexOf("/")+1),
         headers: {
-            "X-Parse-Application-Id": process.env.APP_ID
+            "X-Parse-Application-Id": process.env.APP_ID,
             "X-Parse-REST-API-Key" : process.env.APP_ID
         }
     });

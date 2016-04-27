@@ -347,8 +347,29 @@ Parse.Cloud.define('signUp', function(req, res) {
 	//ok to get password in the clear since we are running over https
 	log.info('[signUp] Info=\'Running cloud code\' username=' + req.params.username + ' password=' + req.params.password + ' email=' + req.params.email);
 
+	//first check for a taken username
+	try{
+	    var username = request.params.username;
+
+		var queryUsername = new Parse.Query("_User");
+		queryUsername.equalTo("username", username);
+
+		queryUsername.find().then(function(results){
+			if(results.length==0) {
+				res.success(true);
+			} else {
+				res.error('username taken');
+			}
+		}, function(error){
+			res.error(error.message);
+		});	  
+	} catch (e){
+		log.error('[signUp] Info=\'Error\' error=' + e.message);
+		res.error(error.message);
+	}
+
 	promises = [];
-	//first save the private data, the user, and the initial post
+	//then save the private data, the user, and the initial post
 
 	//email is private data
 	var PrivateData = Parse.Object.extend('PrivateData');

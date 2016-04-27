@@ -355,9 +355,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 		queryUsername.equalTo("username", username);
 
 		queryUsername.find().then(function(results){
-			if(results.length==0) {
-				res.success(true);
-			} else {
+			if(results.length!=0) {
 				res.error('username taken');
 			}
 		}, function(error){

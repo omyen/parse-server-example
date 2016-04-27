@@ -320,18 +320,26 @@ Parse.Cloud.define('checkPassword', function(request, response)
 
 Parse.Cloud.define('resetPassword', function(request, response) 
 {
-    var username = request.params.username;
+	try{
+	    var username = request.params.username;
 
-	var queryUsername = new Parse.Query("_User");
-	queryUsername.equalTo("username", username);
+		var queryUsername = new Parse.Query("_User");
+		queryUsername.equalTo("username", username);
 
-	queryUsername.find().then(function(results){
-		return Parse.User.requestPasswordReset(result[0].get('email'));
-	}).then(function(result){
-		res.success(true);
-	}, function(error){
+		queryUsername.find().then(function(results){
+			if(results.length==0) {
+				res.error('username not found');
+			}
+			return Parse.User.requestPasswordReset(result[0].get('email'));
+		}).then(function(result){
+			res.success(true);
+		}, function(error){
+			res.error(error.message);
+		});	  
+	} catch (e){
+		log.error('[resetPassword] Info=\'Error\' error=' + e.message);
 		res.error(error.message);
-	});	  
+	}
 });
 
 Parse.Cloud.define('signUp', function(req, res) {

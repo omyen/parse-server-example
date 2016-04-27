@@ -318,6 +318,22 @@ Parse.Cloud.define('checkPassword', function(request, response)
     });
 });
 
+Parse.Cloud.define('resetPassword', function(request, response) 
+{
+    var username = request.params.username;
+
+	var queryUsername = new Parse.Query("_User");
+	queryUsername.equals("username", username);
+
+	queryUsername.find().then(function(results){
+		return Parse.User.requestPasswordReset(result[0].get('email'));
+	}).then(function(result){
+		res.success();
+	}, function(error){
+		res.error(error.message);
+	});	  
+});
+
 Parse.Cloud.define('signUp', function(req, res) {
 	//Parse.Cloud.useMasterKey();
 	//ok to get password in the clear since we are running over https

@@ -328,7 +328,7 @@ Parse.Cloud.define('resetPassword', function(request, response)
 	queryUsername.find().then(function(results){
 		return Parse.User.requestPasswordReset(result[0].get('email'));
 	}).then(function(result){
-		res.success();
+		res.success(true);
 	}, function(error){
 		res.error(error.message);
 	});	  

@@ -330,7 +330,7 @@ Parse.Cloud.define('resetPassword', function(request, response)
 			if(results.length==0) {
 				response.error('username not found');
 			}
-			return Parse.User.requestPasswordReset(result[0].get('email'));
+			return Parse.User.requestPasswordReset(results[0].get('email'));
 		}).then(function(result){
 			response.success(true);
 		}, function(error){

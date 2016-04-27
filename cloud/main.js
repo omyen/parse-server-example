@@ -428,15 +428,23 @@ Parse.Cloud.define('signUp', function(req, res) {
 
 Parse.Cloud.define('deleteFile', function(request, response) 
 {
- 	var imageURL =request.url;    
-	Parse.Cloud.httpRequest({
-        method: 'DELETE',
-        url: imageURL.substring(imageURL.lastIndexOf("/")+1),
-        headers: {
-            "X-Parse-Application-Id": process.env.APP_ID,
-            "X-Parse-REST-API-Key" : process.env.APP_ID
-        }
-    });
+	log.debug('[deleteFile] Info=\'Running cloud code\' url=' + request.url);
+	try{
+	 	var imageURL =request.url;    
+		Parse.Cloud.httpRequest({
+	        method: 'DELETE',
+	        url: imageURL.substring(imageURL.lastIndexOf("/")+1),
+	        headers: {
+	            "X-Parse-Application-Id": process.env.APP_ID,
+	            "X-Parse-REST-API-Key" : process.env.APP_ID
+	        }
+	    });
+	    response.success(true);
+	} catch (e){
+		log.error('[deleteFile] Info=\'Error\' error=' + e.message);
+		response.error(error.message);
+	}
+
 });
 
 Parse.Cloud.define('feedPet', function(req, res) {

@@ -349,7 +349,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 
 	//first check for a taken username
 	try{
-	    var username = request.params.username;
+	    var username = req.params.username;
 
 		var queryUsername = new Parse.Query("_User");
 		queryUsername.equalTo("username", username);

@@ -426,6 +426,19 @@ Parse.Cloud.define('signUp', function(req, res) {
 		});
 });
 
+Parse.Cloud.define('deleteFile', function(request, response) 
+{
+ 	var imageURL =request.url;    
+	Parse.Cloud.httpRequest({
+        method: 'DELETE',
+        url: imageURL.substring(imageURL.lastIndexOf("/")+1),
+        headers: {
+            "X-Parse-Application-Id": process.env.APP_ID
+            "X-Parse-REST-API-Key" : process.env.APP_ID
+        }
+    });
+});
+
 Parse.Cloud.define('feedPet', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	log.info('[feedPet] Info=\'Running cloud code\' petId=' + req.params.petId + ' fedBy=' + req.params.fedBy + ' fedAt=' + req.params.fedAt);

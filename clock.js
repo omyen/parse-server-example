@@ -12,10 +12,6 @@ Parse.Cloud.useMasterKey();
 var RETRIES = 2;
 
 function propagateAd(post){
-	var now = new Date();
-	var daysSinceEpoch =  Math.floor(now/86400000);
-	post.set('creationDay', daysSinceEpoch);
-
 	var toSave = [];
 
 	var query = new Parse.Query("_User");
@@ -37,10 +33,6 @@ function propagateAd(post){
 }
 
 function propagatePost(post){
-	var now = new Date();
-	var daysSinceEpoch =  Math.floor(now/86400000);
-	post.set('creationDay', daysSinceEpoch);
-
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
 	post.get('causingUser').relation('posts').add(post);
 
@@ -174,6 +166,7 @@ function publishAd(post, queueItem){
 	try{
 		post.set('type', 'ad');
 		post.set('title', queueItem.get('title'));	
+		post.set('image', queueItem.get('photo'));	
 		post.set('url', queueItem.get('url'));	
 	} catch (e){
 		log.error('[publishAd] Info=\'Failed to set post properties\' error=' + e.message);
@@ -216,6 +209,10 @@ function processPublishQueue(){
 				post.set('numberPats', 0);
 				post.set('causingUser', queueItem.get('causingUser'));
 				post.set('aboutPet', queueItem.get('aboutPet'));
+				var now = new Date();
+				var daysSinceEpoch =  Math.floor(now/86400000);
+				post.set('creationDay', daysSinceEpoch);
+
 			} catch (e){
 				log.error('[processPublishQueue] Info=\'Failed to set post properties\' error=' + e.message);
 				return; //try next queue item

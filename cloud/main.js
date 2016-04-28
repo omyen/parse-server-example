@@ -76,6 +76,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 			log.error('[beforeSave Pet] Info=\'Failed to set properties for new pet\' error=' + e.message);
 		}
 		res.success();
+		return;
 	}
 
 	//todo jump out if only dailes were reset
@@ -366,6 +367,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	} catch (e){
 		log.error('[signUp] Info=\'Error\' error=' + e.message);
 		res.error(e.message);
+		return;
 	}
 
 	promises = [];
@@ -615,17 +617,6 @@ Parse.Cloud.define('getPosts', function(req, res) {
 	
 });
 
-String.prototype.hashCode = function() {
-  var hash = 0, i, chr, len;
-  if (this.length === 0) return hash;
-  for (i = 0, len = this.length; i < len; i++) {
-    chr   = this.charCodeAt(i);
-    hash  = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-};
-
 Parse.Cloud.define('postAd', function(req, res) {
 	try{
 
@@ -633,6 +624,7 @@ Parse.Cloud.define('postAd', function(req, res) {
 		
 		if(req.user.id != 'juAkCJSEY0'){
 			res.error('unauthorised user');
+			return;
 		}
 
 		var Photo = Parse.Object.extend('Photo');

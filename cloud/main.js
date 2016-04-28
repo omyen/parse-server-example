@@ -613,3 +613,21 @@ Parse.Cloud.define('getPosts', function(req, res) {
 	
 });
 
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr, len;
+  if (this.length === 0) return hash;
+  for (i = 0, len = this.length; i < len; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
+Parse.Cloud.define('postAd', function(req, res) {
+	Parse.Cloud.useMasterKey();
+	log.info('[postAd] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' password=' + req.params.password + ' passwordHashed=' + req.params.password.hashCode);
+	
+	res.success(true);
+});
+

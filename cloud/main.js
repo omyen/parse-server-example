@@ -441,6 +441,7 @@ Parse.Cloud.define('deleteFile', function(request, response)
 	    }).then(function(result){
 	    	response.success(true);
 	    }, function(error){
+	    	log.error('[deleteFile] Info=\'Error\' error=' + error.message);
 			response.error(error.message);
 	    });
 	    
@@ -602,7 +603,7 @@ Parse.Cloud.define('getPosts', function(req, res) {
 	queryPosts.skip(req.params.startPost);
 	queryPosts.include('image');
 	queryPosts.include('pattedBy');
-	queryPosts.descending('updatedAt');
+	queryPosts.descending('creationDay', 'updatedAt');
 
 	queryPosts.find().then(function(results){
 			res.success(results);

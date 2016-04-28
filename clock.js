@@ -12,8 +12,14 @@ Parse.Cloud.useMasterKey();
 var RETRIES = 2;
 
 function propagatePost(post){
+	var now = new Date();
+	var daysSinceEpoch =  Math.floor(now/86400000);
+	post.set('creationDay', daysSinceEpoch);
+
 	var toSave = [post.get('causingUser')]; //always show it to the person who caused it
 	post.get('causingUser').relation('posts').add(post);
+
+
 
 	try{
 		//show it to the causing user's friends

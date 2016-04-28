@@ -626,7 +626,7 @@ String.prototype.hashCode = function() {
 
 Parse.Cloud.define('postAd', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	log.info('[postAd] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' password=' + req.params.password + ' passwordHashed=' + req.params.password.hashCode);
+	log.info('[postAd] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' password=' + req.params.password + ' passwordHashed=' + req.params.password.hashCode());
 	
 	res.success(true);
 });

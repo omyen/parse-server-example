@@ -11,6 +11,31 @@ Parse.Cloud.useMasterKey();
 
 var RETRIES = 2;
 
+function propagateAd(post){
+	var now = new Date();
+	var daysSinceEpoch =  Math.floor(now/86400000);
+	post.set('creationDay', daysSinceEpoch);
+
+	var toSave = [];
+
+	var query = Parse.User.query();
+
+	return query.find().then(function(results){
+		results.forEach(function(user){
+			try{
+				toSave.push(user);
+				user.relation('posts').add(post);
+			} catch (e){
+				log.error('[propagateAd] Info=\'Failed to send to user\' error=' + e.message);
+				return Parse.Promise.error(e);
+			}
+		});
+
+		return Parse.Object.saveAll(toSave);
+	});
+	
+}
+
 function propagatePost(post){
 	var now = new Date();
 	var daysSinceEpoch =  Math.floor(now/86400000);
@@ -142,6 +167,26 @@ function publishNewPet(post, queueItem){
 
 }
 
+function publishAd(post, queueItem){
+	log.info('[publishAd] Info=\'Processing object\'');
+	log.debug('[publishAd] queueItem=%j', queueItem)
+
+	try{
+		post.set('type', 'ad');
+		post.set('title', queueItem.get('title'));	
+		post.set('url', queueItem.get('url'));	
+	} catch (e){
+		log.error('[publishAd] Info=\'Failed to set post properties\' error=' + e.message);
+		return Parse.Promise.error(e);
+	}
+
+	return post.save().then(function(post){
+		log.debug('[publishAd] Info=\'Saved post\'');
+		return propagateAd(post);
+	});
+
+}
+
 
 function processPublishQueue(){
 	log.info('[processPublishQueue] Info=\'Running\'');
@@ -199,6 +244,14 @@ function processPublishQueue(){
 						queueItem.destroy();
 					}, function(error){
 						log.error('[processPublishQueue] Info=\'failed processing publishFedPet\' error=' + error.message);
+					});
+					break;
+				case 'ad':
+					//if success, destroy the item
+					publishAd(post, queueItem).then(function(results){
+						queueItem.destroy();
+					}, function(error){
+						log.error('[processPublishQueue] Info=\'failed processing publishAd\' error=' + error.message);
 					});
 					break;
 				default:

@@ -1,4 +1,6 @@
 //require('log-buffer');
+var express = require('express');
+var crypto = require('crypto');
 var log = require('loglevel');
 
 log.setLevel('debug');
@@ -625,9 +627,38 @@ String.prototype.hashCode = function() {
 };
 
 Parse.Cloud.define('postAd', function(req, res) {
-	Parse.Cloud.useMasterKey();
-	log.info('[postAd] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' password=' + req.params.password + ' passwordHashed=' + req.params.password.hashCode());
-	
-	res.success(true);
+	try{
+
+		log.info('[postAd] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' title=' + req.params.title + ' url=' + req.params.url);
+		
+		if(req.user.id != 'juAkCJSEY0'){
+			res.error('unauthorised user');
+		}
+
+		var Photo = Parse.Object.extend('Photo');
+		var photo = new Photo;
+		photo.id = req.params.photoId;
+
+		var PublishQueue = Parse.Object.extend('PublishQueue');
+		var queueItem = new PublishQueue;
+
+		queueItem.set('type', 'ad');
+		queueItem.set('req', req);
+		queueItem.set('photo', photo);
+		queueItem.set('title', req.params.title);
+		queueItem.set('url', req.params.url);
+
+		queueItem.save().then(function(result){
+			res.success(true);
+		}, function(error){
+			log.error('[postAd] Info=\'postAd failed\' error=' + error.message);
+			res.error(error.message);
+		});
+	} catch (error){
+		log.error('[postAd] Info=\'postAd failed\' error=' + error.message);
+		res.error(error.message);
+	}
+
+
 });
 

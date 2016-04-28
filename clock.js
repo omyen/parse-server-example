@@ -18,7 +18,7 @@ function propagateAd(post){
 
 	var toSave = [];
 
-	var query = Parse.User.query();
+	var query = new Parse.Query("_User");
 
 	return query.find().then(function(results){
 		results.forEach(function(user){

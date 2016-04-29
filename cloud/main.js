@@ -310,7 +310,7 @@ Parse.Cloud.afterSave("Photo", function(request) {
 	try{
 	  var imageObject = request.object;
 	  var imageFile = imageObject.get('photo');
-	  var Image = require("parse-image");
+	  //var Image = require("parse-image");
 	  Parse.Cloud.httpRequest({url: imageFile.url()}).then(function(response) {
 	        // The file contents are in response.buffer.
 	        log.debug("[afterSave Photo] got imagefile");
@@ -326,10 +326,10 @@ Parse.Cloud.afterSave("Photo", function(request) {
 	    	log.debug("[afterSave Photo] success");
 	    }, function(error) {
 	      // The networking request failed.
-	      log.error("[afterSave Photo] Photo Cannot update image dimensions" + error.code + " : " + error.message);
+	      log.error("[afterSave Photo] Photo Cannot update image dimensions " + error.code + " : " + error.message);
 	    });
 	} catch (error){
-		log.error("[afterSave Photo] Failed" + error.code + " : " + error.message);
+		log.error("[afterSave Photo] Failed " + error.code + " : " + error.message);
 	}
 });
 

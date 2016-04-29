@@ -304,6 +304,36 @@ Parse.Cloud.afterSave('Post', function(req)
 
 });
 
+// Updates image width and height after save
+Parse.Cloud.afterSave("Photo", function(request) {  
+  var imageObject = request.object;
+  var imageFile = imageObject.get('photo');
+  var Image = require("parse-image");
+  Parse.Cloud.httpRequest({
+    url: imageFile.url(),
+    success: function(response) {
+        // The file contents are in response.buffer.
+        var image = new Image();
+        return image.setData(response.buffer, {
+            success: function() {
+              imageObject.set('width', image.width());
+              imageObject.set('height', image.height());
+              imageObject.set('aspectRatio', image.width()/image.height());
+              imageObject.save();
+            },
+            error: function(error) {
+              // The image data was invalid.
+              log.error("The image data was invalid." + error.code + " : " + error.message);
+            }
+        })
+    },
+    error: function(error) {
+      // The networking request failed.
+      log.error("Cannot update image dimensions" + error.code + " : " + error.message);
+    }
+  });
+});
+
 //==============================
 
 Parse.Cloud.define('checkPassword', function(request, response) 

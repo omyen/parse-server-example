@@ -310,7 +310,7 @@ Parse.Cloud.afterSave("Photo", function(request) {
 	try{
 	  var imageObject = request.object;
 	  var imageFile = imageObject.get('photo');
-	  //var Image = require("parse-image");
+	  var Image = require("parse-image");
 	  Parse.Cloud.httpRequest({url: imageFile.url()}).then(function(response) {
 	        // The file contents are in response.buffer.
 	        log.debug("[afterSave Photo] got imagefile");

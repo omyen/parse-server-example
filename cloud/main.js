@@ -306,6 +306,10 @@ Parse.Cloud.afterSave('Post', function(req)
 
 // Updates image width and height after save
 Parse.Cloud.afterSave("Photo", function(request) {  
+	if(request.object.existed()){
+		return;
+	}
+
 	Parse.Cloud.useMasterKey();
 	log.info("[afterSave Photo]");
 	try{
@@ -320,11 +324,11 @@ Parse.Cloud.afterSave("Photo", function(request) {
 	    }).then(function(result){
 	    	log.debug("[afterSave Photo] set data");
 	      	imageObject.set('width', result.width());
-	      	log.debug("[afterSave Photo] set width");
+	      	//log.debug("[afterSave Photo] set width");
 			imageObject.set('height', result.height());
-			log.debug("[afterSave Photo] set height");
+			//log.debug("[afterSave Photo] set height");
 			imageObject.set('aspectRatio', result.width()/result.height());
-			log.debug("[afterSave Photo] set aspectRatio");
+			//log.debug("[afterSave Photo] set aspectRatio");
 			return imageObject.save();
 	    }).then(function(result){
 	    	log.debug("[afterSave Photo] success");

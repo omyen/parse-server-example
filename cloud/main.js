@@ -306,33 +306,31 @@ Parse.Cloud.afterSave('Post', function(req)
 
 // Updates image width and height after save
 Parse.Cloud.afterSave("Photo", function(request) {  
-	log.info("afterSave Photo");
-  var imageObject = request.object;
-  var imageFile = imageObject.get('photo');
-  var Image = require("parse-image");
-  Parse.Cloud.httpRequest({
-    url: imageFile.url(),
-    success: function(response) {
-        // The file contents are in response.buffer.
-        var image = new Image();
-        return image.setData(response.buffer, {
-            success: function() {
-              imageObject.set('width', image.width());
-              imageObject.set('height', image.height());
-              imageObject.set('aspectRatio', image.width()/image.height());
-              imageObject.save();
-            },
-            error: function(error) {
-              // The image data was invalid.
-              log.error("The image data was invalid." + error.code + " : " + error.message);
-            }
-        })
-    },
-    error: function(error) {
-      // The networking request failed.
-      log.error("Cannot update image dimensions" + error.code + " : " + error.message);
-    }
-  });
+	log.info("[afterSave Photo]");
+	try{
+	  var imageObject = request.object;
+	  var imageFile = imageObject.get('photo');
+	  var Image = require("parse-image");
+	  Parse.Cloud.httpRequest({url: imageFile.url()}).then(function(response) {
+	        // The file contents are in response.buffer.
+	        log.debug("[afterSave Photo] got imagefile");
+	        var image = new Image();
+	        return image.setData(response.buffer);
+	    }).then(function(result){
+	    	log.debug("[afterSave Photo] set data");
+	      	imageObject.set('width', result.width());
+			imageObject.set('height', result.height());
+			imageObject.set('aspectRatio', result.width()/result.height());
+			return imageObject.save();
+	    }).then(function(result){
+	    	log.debug("[afterSave Photo] success");
+	    }, function(error) {
+	      // The networking request failed.
+	      log.error("[afterSave Photo] Photo Cannot update image dimensions" + error.code + " : " + error.message);
+	    });
+	} catch (error){
+		log.error("[afterSave Photo] Failed" + error.code + " : " + error.message);
+	}
 });
 
 //==============================

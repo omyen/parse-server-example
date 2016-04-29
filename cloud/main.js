@@ -306,6 +306,7 @@ Parse.Cloud.afterSave('Post', function(req)
 
 // Updates image width and height after save
 Parse.Cloud.afterSave("Photo", function(request) {  
+	Parse.Cloud.useMasterKey();
 	log.info("[afterSave Photo]");
 	try{
 	  var imageObject = request.object;

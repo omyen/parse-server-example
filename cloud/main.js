@@ -360,17 +360,19 @@ Parse.Cloud.define('checkPassword', function(request, response)
 
 Parse.Cloud.define('resetPassword', function(request, response) 
 {
+	Parse.Cloud.useMasterKey();
 	try{
 	    var username = request.params.username;
 
 		var queryUsername = new Parse.Query("_User");
 		queryUsername.equalTo("username", username);
+		queryUsername.include('privateData');
 
 		queryUsername.find().then(function(results){
 			if(results.length==0) {
 				response.error('username not found');
 			}
-			return Parse.User.requestPasswordReset(results[0].get('email'));
+			return Parse.User.requestPasswordReset(results[0].get('privateData').get('email'));
 		}).then(function(result){
 			response.success(true);
 		}, function(error){

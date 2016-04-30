@@ -661,34 +661,33 @@ Parse.Cloud.define('postAd', function(req, res) {
 
 		log.info('[postAd] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' title=' + req.params.title + ' url=' + req.params.url);
 		
-		if(req.user.id != 'juAkCJSEY0'){
-			res.error('unauthorised user');
-			return;
-		}
+	    var password = req.params.password;
 
-		var Photo = Parse.Object.extend('Photo');
-		var photo = new Photo;
-		photo.id = req.params.photoId;
+	    Parse.User.logIn(req.user.getUsername(), password).then(function(result){
+			var Photo = Parse.Object.extend('Photo');
+			var photo = new Photo;
+			photo.id = req.params.photoId;
 
-		var PublishQueue = Parse.Object.extend('PublishQueue');
-		var queueItem = new PublishQueue;
+			var PublishQueue = Parse.Object.extend('PublishQueue');
+			var queueItem = new PublishQueue;
 
-		queueItem.set('type', 'ad');
-		queueItem.set('req', req);
-		queueItem.set('photo', photo);
-		queueItem.set('title', req.params.title);
-		queueItem.set('url', req.params.url);
+			queueItem.set('type', 'ad');
+			queueItem.set('req', req);
+			queueItem.set('photo', photo);
+			queueItem.set('title', req.params.title);
+			queueItem.set('url', req.params.url);
 
-		queueItem.save().then(function(result){
-			res.success(true);
-		}, function(error){
+			return queueItem.save();
+	    }, function(error){
+	    	log.error('[postAd] Info=\'not auth\' error=' + error.message);
+			res.error(error.message);
+	    }).then(function(result){
+	    	res.success(true);
+	    }, function(error){
 			log.error('[postAd] Info=\'postAd failed\' error=' + error.message);
 			res.error(error.message);
-		});
-	} catch (error){
-		log.error('[postAd] Info=\'postAd failed\' error=' + error.message);
-		res.error(error.message);
-	}
+	    });
+
 
 
 });

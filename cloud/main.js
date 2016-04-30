@@ -452,6 +452,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 
 			var aclPrivate = new Parse.ACL();
 			aclPrivate.setPublicReadAccess(false);
+			aclPrivate.setReadAccess(user, true);
 			aclPrivate.setWriteAccess(user, true);
 			privateData.setACL(aclPrivate);
 			promises.push(privateData.save());

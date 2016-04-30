@@ -689,6 +689,12 @@ Parse.Cloud.define('postAd', function(req, res) {
 	    });
 
 
+		
+	} catch (error){
+		log.error('[postAd] Info=\'postAd failed\' error=' + error.message);
+		res.error(error.message);
+	}
+
 
 });
 

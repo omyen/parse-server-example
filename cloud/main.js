@@ -660,7 +660,10 @@ Parse.Cloud.define('postAd', function(req, res) {
 	try{
 
 		log.info('[postAd] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' title=' + req.params.title + ' url=' + req.params.url);
-		
+		if(req.user.getUsername() != 'adPostingUser'){
+			res.error('not auth');
+		}
+
 	    var password = req.params.password;
 
 	    Parse.User.logIn(req.user.getUsername(), password).then(function(result){
@@ -679,7 +682,7 @@ Parse.Cloud.define('postAd', function(req, res) {
 
 			return queueItem.save();
 	    }, function(error){
-	    	log.error('[postAd] Info=\'not auth\' error=' + error.message);
+	    	log.error('[postAd] Info=\'bad password\' error=' + error.message);
 			res.error(error.message);
 	    }).then(function(result){
 	    	res.success(true);

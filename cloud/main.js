@@ -602,6 +602,26 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	
 });
 
+Parse.Cloud.define('declineRequest', function(req, res) {
+	Parse.Cloud.useMasterKey();
+	log.info('[declineRequest] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
+
+	var FriendRequest = Parse.Object.extend('FriendRequest');
+	
+	
+	var friendRequest = new FriendRequest;
+	friendRequest.id = req.params.requestId;
+	friendRequest.destroy().then(
+	function(result) {
+		log.debug('[declineRequest] Info=\'declineRequest complete\'');
+		res.success('OK');
+	}, function(error) {
+		log.error('[declineRequest] Info=\'declineRequest failed\' error=' + error.message);
+		res.error(error.message);
+	}); 
+	
+});
+
 Parse.Cloud.define('searchFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	log.info('[searchFriend] Info=\'Running cloud code\' searchTerm=' + req.params.searchTerm);
@@ -639,11 +659,11 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 		
 		relationPets = user.relation('friendPets');
 		if(change.isFeeder){
-			log.debug('[setFeedersChanges] Info=\'Adding pet to list\'');
+			log.debug('[setOwnersChanges] Info=\'Adding pet to list\'');
 			relationPets.add(pet);
 			relationFriends.add(user);
 		} else {
-			log.debug('[setFeedersChanges] Info=\'Removing pet from list\'');
+			log.debug('[setOwnersChanges] Info=\'Removing pet from list\'');
 			relationPets.remove(pet);
 			relationFriends.remove(user);
 		}
@@ -653,10 +673,10 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 	
 	
 	Parse.Object.saveAll(toSave).then(function(result) {
-		log.debug('[addFriend] Info=\'setFeedersChanges complete\'');
+		log.debug('[setOwnersChanges] Info=\'setOwnersChanges complete\'');
 		res.success('OK');
 	}, function(error) {
-		log.error('[addFriend] Info=\'setFeedersChanges failed\' error=' + error.message);
+		log.error('[setOwnersChanges] Info=\'setOwnersChanges failed\' error=' + error.message);
 		res.error(error.message);
 	}); 
 });

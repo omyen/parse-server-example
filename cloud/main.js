@@ -84,22 +84,17 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 
 	try{
-		log.info('1');
 		var dirtyKeys = pet.dirtyKeys();
-		log.info('2');
 		pet.set('lastDirtyKeys', dirtyKeys);
-		log.info('3');
 		if(!dirtyKeys){
 			res.success();
 			return;
 		}
-		log.info('4');
 		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
-		log.info('5');
+
 
 		//collect info for XP
 		for (var i = 0; i < dirtyKeys.length; ++i) {
-			log.info('6:' + i);
 			var dirtyKey = dirtyKeys[i];
 			switch(dirtyKey){
 				case 'profilePhoto':
@@ -168,7 +163,6 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 	} catch (e){
 		log.error('[beforeSave Pet] Info=\'Failed to set dirtyKeys and XP for pet\' error=' + e.message);
 	}
-	log.info('7');
 	//either way, return success to the user
 	res.success();
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
@@ -180,7 +174,6 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 //afterSave
 Parse.Cloud.afterSave('Pet', function(req) 
 {	
-	log.info('[afterSave Pet] Info=\'Pet\'');
 	//first check to see if it's a brand new pet :3
 	if(!req.object.existed()){
 		try{
@@ -658,7 +651,6 @@ Parse.Cloud.define('getPosts', function(req, res) {
 	queryPosts.limit(req.params.numPosts);
 	queryPosts.skip(req.params.startPost);
 	queryPosts.include('image');
-	queryPosts.include('pattedBy');
 	queryPosts.descending('creationDay', 'updatedAt');
 
 	queryPosts.find().then(function(results){

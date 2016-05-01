@@ -286,16 +286,8 @@ function processPublishQueue(){
 				queueItem.save();
 			}
 			log.info('[processPublishQueue] Info=\'Processing post\' type=' + queueItem.get('type') + 'retries=' + queueItem.get('retries'));
-			if(queueItem.get('aboutPet')){
-				queueItem.get('aboutPet').fetch().then(function(result){
-					processQueueItem(queueItem);
-				}, function(error){
-					log.error('[processPublishQueue] Info=\'failed fetching aboutPet\' error=' + error.message);
-				});
-			} else {
-				processQueueItem(queueItem);
-			}
-			
+			processQueueItem(queueItem);
+
 		});
 	});
 }

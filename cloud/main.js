@@ -84,17 +84,22 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 
 	try{
+		log.info('1');
 		var dirtyKeys = pet.dirtyKeys();
+		log.info('2');
 		pet.set('lastDirtyKeys', dirtyKeys);
+		log.info('3');
 		if(!dirtyKeys){
 			res.success();
 			return;
 		}
+		log.info('4');
 		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
-
+		log.info('5');
 
 		//collect info for XP
 		for (var i = 0; i < dirtyKeys.length; ++i) {
+			log.info('6:' + i);
 			var dirtyKey = dirtyKeys[i];
 			switch(dirtyKey){
 				case 'profilePhoto':

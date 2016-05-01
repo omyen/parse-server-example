@@ -168,6 +168,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 	} catch (e){
 		log.error('[beforeSave Pet] Info=\'Failed to set dirtyKeys and XP for pet\' error=' + e.message);
 	}
+	log.info('7');
 	//either way, return success to the user
 	res.success();
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
@@ -179,6 +180,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 //afterSave
 Parse.Cloud.afterSave('Pet', function(req) 
 {	
+	log.info('[afterSave Pet] Info=\'Pet\'');
 	//first check to see if it's a brand new pet :3
 	if(!req.object.existed()){
 		try{

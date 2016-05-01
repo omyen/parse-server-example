@@ -87,6 +87,10 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 		var dirtyKeys = pet.dirtyKeys();
 		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
 		pet.set('lastDirtyKeys', dirtyKeys);
+		if(!dirtyKeys){
+			res.success();
+			return;
+		}
 
 		//collect info for XP
 		for (var i = 0; i < dirtyKeys.length; ++i) {
@@ -190,7 +194,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 	//otherwise let's see what changed
     var dirtyKeys = pet.get('lastDirtyKeys');
     if(!dirtyKeys) {
-    	log.error('[afterSave Pet] Info=\'No dirtyKeys\'');
+    	log.warn('[afterSave Pet] Info=\'No dirtyKeys\'');
 		return; 
  	} 
 

@@ -140,6 +140,26 @@ function publishNewPetPhoto(post, queueItem){
 
 }
 
+function publishLevelUp(post, queueItem){
+	log.info('[publishLevelUp] Info=\'Processing object\'');
+	log.debug('[publishLevelUp] queueItem=%j', queueItem)
+
+	try{
+		post.set('type', 'levelUp');
+		post.set('title', queueItem.get('aboutPet').get('name') + ' is now level ' + queueItem.get('level'));
+		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
+	} catch (e){
+		log.error('[publishLevelUp] Info=\'Failed to set post properties\' error=' + e.message);
+		return Parse.Promise.error(e);
+	}
+
+	return post.save().then(function(post){
+		log.debug('[publishLevelUp] Info=\'Saved post\'');
+		return propagatePost(post);
+	});
+
+}
+
 function publishNewPet(post, queueItem){
 	log.info('[publishNewPet] Info=\'Processing object\'');
 	log.debug('[publishNewPet] queueItem=%j', queueItem)
@@ -158,6 +178,8 @@ function publishNewPet(post, queueItem){
 	});
 
 }
+
+
 
 function publishAd(post, queueItem){
 	log.info('[publishAd] Info=\'Processing object\'');
@@ -241,6 +263,14 @@ function processPublishQueue(){
 						queueItem.destroy();
 					}, function(error){
 						log.error('[processPublishQueue] Info=\'failed processing publishFedPet\' error=' + error.message);
+					});
+					break;
+				case 'levelUp':
+					//if success, destroy the item
+					publishLevelUp(post, queueItem).then(function(results){
+						queueItem.destroy();
+					}, function(error){
+						log.error('[processPublishQueue] Info=\'failed processing levelUp\' error=' + error.message);
 					});
 					break;
 				case 'ad':

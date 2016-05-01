@@ -211,6 +211,12 @@ Parse.Cloud.afterSave('Pet', function(req)
 				log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty - queueing post\'');
 				//profilePhoto is the latest photo
 				try{
+
+					if(pet.get('numberPhotosAddedToday')>NEW_PHOTO_POSTS_PER_PET_PER_DAY){
+						log.debug('[afterSave Pet] Info=\'Pet already added too many photos today - not queueing post\'');
+						continue;
+					} 
+
 					var PublishQueue = Parse.Object.extend('PublishQueue');
 					var queueItem = new PublishQueue;
 
@@ -247,6 +253,26 @@ Parse.Cloud.afterSave('Pet', function(req)
 					toSave.push(queueItem);
 				} catch (e){
 					log.error('[afterSave Pet] Info=\'Failed to set post properties for lastFeedingLog update\' error=' + e.message);
+					return; 
+				}
+
+				break;
+			case 'level':
+				log.debug('[afterSave Pet] Info=\'Pet level is dirty - queueing post\'');
+				//profilePhoto is the latest photo
+				try{
+					var PublishQueue = Parse.Object.extend('PublishQueue');
+					var queueItem = new PublishQueue;
+
+					queueItem.set('type', 'levelUp');
+					queueItem.set('req', req);
+					queueItem.set('causingUser', req.user); 
+					queueItem.set('aboutPet', pet);
+					queueItem.set('newLevel', pet.get('level'));
+					queueItem.set('photo', pet.get('profilePhoto'));
+					toSave.push(queueItem);
+				} catch (e){
+					log.error('[afterSave Pet] Info=\'Failed to set post properties for level update\' error=' + e.message);
 					return; 
 				}
 				

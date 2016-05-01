@@ -94,7 +94,7 @@ function publishFedPet(post, queueItem){
 	try{
 		post.set('type', 'fedPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
-		post.set('image', queueItem.get('photo'));
+		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
 	} catch (e){
 		log.error('[publishFedPet] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
@@ -147,7 +147,7 @@ function publishLevelUp(post, queueItem){
 	try{
 		post.set('type', 'levelUp');
 		post.set('title', queueItem.get('aboutPet').get('name') + ' is now level ' + queueItem.get('newLevel'));
-		post.set('image', queueItem.get('photo'));
+		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
 	} catch (e){
 		log.error('[publishLevelUp] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
@@ -202,6 +202,68 @@ function publishAd(post, queueItem){
 
 }
 
+function processQueueItem(queueItem){
+	try{
+		var Post = Parse.Object.extend('Post');
+		var post = new Post();
+		post.set('numberPats', 0);
+		post.set('causingUser', queueItem.get('causingUser'));
+		post.set('aboutPet', queueItem.get('aboutPet'));
+		var now = new Date();
+		var daysSinceEpoch =  Math.floor(now/86400000);
+		post.set('creationDay', daysSinceEpoch);
+
+	} catch (e){
+		log.error('[processQueueItem] Info=\'Failed to set post properties\' error=' + e.message);
+		return; //try next queue item
+	}
+
+	switch(queueItem.get('type')){
+		case 'newPetPhoto':
+			//if success, destroy the item
+			publishNewPetPhoto(post, queueItem).then(function(results){
+				queueItem.destroy();
+			}, function(error){
+				log.error('[processQueueItem] Info=\'failed processing publishNewPetPhoto\' error=' + error.message);
+			});
+			break;
+		case 'newPet':
+			//if success, destroy the item
+			publishNewPet(post, queueItem).then(function(results){
+				queueItem.destroy();
+			}, function(error){
+				log.error('[processQueueItem] Info=\'failed processing publishNewPet\' error=' + error.message);
+			});
+			break;
+		case 'fedPet':
+			//if success, destroy the item
+			publishFedPet(post, queueItem).then(function(results){
+				queueItem.destroy();
+			}, function(error){
+				log.error('[processQueueItem] Info=\'failed processing publishFedPet\' error=' + error.message);
+			});
+			break;
+		case 'levelUp':
+			//if success, destroy the item
+			publishLevelUp(post, queueItem).then(function(results){
+				queueItem.destroy();
+			}, function(error){
+				log.error('[processQueueItem] Info=\'failed processing levelUp\' error=' + error.message);
+			});
+			break;
+		case 'ad':
+			//if success, destroy the item
+			publishAd(post, queueItem).then(function(results){
+				queueItem.destroy();
+			}, function(error){
+				log.error('[processQueueItem] Info=\'failed processing publishAd\' error=' + error.message);
+			});
+			break;
+		default:
+			log.warn('[processQueueItem] Info=\'Unknown post type\' type=' + queueItem.get('type'));
+			break;
+	}
+}
 
 function processPublishQueue(){
 	log.info('[processPublishQueue] Info=\'Running\'');
@@ -224,67 +286,16 @@ function processPublishQueue(){
 				queueItem.save();
 			}
 			log.info('[processPublishQueue] Info=\'Processing post\' type=' + queueItem.get('type') + 'retries=' + queueItem.get('retries'));
-
-			try{
-				var Post = Parse.Object.extend('Post');
-				var post = new Post();
-				post.set('numberPats', 0);
-				post.set('causingUser', queueItem.get('causingUser'));
-				post.set('aboutPet', queueItem.get('aboutPet'));
-				var now = new Date();
-				var daysSinceEpoch =  Math.floor(now/86400000);
-				post.set('creationDay', daysSinceEpoch);
-
-			} catch (e){
-				log.error('[processPublishQueue] Info=\'Failed to set post properties\' error=' + e.message);
-				return; //try next queue item
+			if(queueItem.get('aboutPet')){
+				queueItem.get('aboutPet').fetch().then(function(result){
+					processQueueItem(queueItem);
+				}, function(error){
+					log.error('[processPublishQueue] Info=\'failed fetching aboutPet\' error=' + error.message);
+				});
+			} else {
+				processQueueItem(queueItem);
 			}
-
-			switch(queueItem.get('type')){
-				case 'newPetPhoto':
-					//if success, destroy the item
-					publishNewPetPhoto(post, queueItem).then(function(results){
-						queueItem.destroy();
-					}, function(error){
-						log.error('[processPublishQueue] Info=\'failed processing publishNewPetPhoto\' error=' + error.message);
-					});
-					break;
-				case 'newPet':
-					//if success, destroy the item
-					publishNewPet(post, queueItem).then(function(results){
-						queueItem.destroy();
-					}, function(error){
-						log.error('[processPublishQueue] Info=\'failed processing publishNewPet\' error=' + error.message);
-					});
-					break;
-				case 'fedPet':
-					//if success, destroy the item
-					publishFedPet(post, queueItem).then(function(results){
-						queueItem.destroy();
-					}, function(error){
-						log.error('[processPublishQueue] Info=\'failed processing publishFedPet\' error=' + error.message);
-					});
-					break;
-				case 'levelUp':
-					//if success, destroy the item
-					publishLevelUp(post, queueItem).then(function(results){
-						queueItem.destroy();
-					}, function(error){
-						log.error('[processPublishQueue] Info=\'failed processing levelUp\' error=' + error.message);
-					});
-					break;
-				case 'ad':
-					//if success, destroy the item
-					publishAd(post, queueItem).then(function(results){
-						queueItem.destroy();
-					}, function(error){
-						log.error('[processPublishQueue] Info=\'failed processing publishAd\' error=' + error.message);
-					});
-					break;
-				default:
-					log.warn('[processPublishQueue] Info=\'Unknown post type\' type=' + queueItem.get('type'));
-					break;
-			}
+			
 		});
 	});
 }

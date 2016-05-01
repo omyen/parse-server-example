@@ -249,7 +249,6 @@ Parse.Cloud.afterSave('Pet', function(req)
 					queueItem.set('req', req);
 					queueItem.set('causingUser', pet.get('lastFeedingUser'));
 					queueItem.set('aboutPet', pet);
-					queueItem.set('photo', pet.get('profilePhoto'));
 					toSave.push(queueItem);
 				} catch (e){
 					log.error('[afterSave Pet] Info=\'Failed to set post properties for lastFeedingLog update\' error=' + e.message);
@@ -269,13 +268,12 @@ Parse.Cloud.afterSave('Pet', function(req)
 					queueItem.set('causingUser', req.user); 
 					queueItem.set('aboutPet', pet);
 					queueItem.set('newLevel', pet.get('level'));
-					queueItem.set('photo', pet.get('profilePhoto'));
 					toSave.push(queueItem);
 				} catch (e){
 					log.error('[afterSave Pet] Info=\'Failed to set post properties for level update\' error=' + e.message);
 					return; 
 				}
-				
+
 				break;
 			default:
 				break;

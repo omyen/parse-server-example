@@ -94,7 +94,7 @@ function publishFedPet(post, queueItem){
 	try{
 		post.set('type', 'fedPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
-		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
+		post.set('image', queueItem.get('photo'));
 	} catch (e){
 		log.error('[publishFedPet] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
@@ -146,8 +146,8 @@ function publishLevelUp(post, queueItem){
 
 	try{
 		post.set('type', 'levelUp');
-		post.set('title', queueItem.get('aboutPet').get('name') + ' is now level ' + queueItem.get('level'));
-		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
+		post.set('title', queueItem.get('aboutPet').get('name') + ' is now level ' + queueItem.get('newLevel'));
+		post.set('image', queueItem.get('photo'));
 	} catch (e){
 		log.error('[publishLevelUp] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);

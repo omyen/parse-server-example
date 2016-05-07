@@ -246,132 +246,137 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 //afterSave
 Parse.Cloud.afterSave('Pet', function(req) 
 {	
-	//first check to see if it's a brand new pet :3
-	if(!req.object.existed()){
-		try{
-			var PublishQueue = Parse.Object.extend('PublishQueue');
-			var queueItem = new PublishQueue;
+	try{
+		//first check to see if it's a brand new pet :3
+		if(!req.object.existed()){
+			try{
+				var PublishQueue = Parse.Object.extend('PublishQueue');
+				var queueItem = new PublishQueue;
 
-			queueItem.set('type', 'newPet');
-			queueItem.set('req', req);
-			queueItem.set('causingUser', req.user);
-			queueItem.set('aboutPet', req.object);
-			queueItem.save();
-		} catch (e){
-			log.error('[afterSave Pet] Info=\'Failed to set post properties for new pet\' error=' + e.message);
+				queueItem.set('type', 'newPet');
+				queueItem.set('req', req);
+				queueItem.set('causingUser', req.user);
+				queueItem.set('aboutPet', req.object);
+				queueItem.save();
+			} catch (e){
+				log.error('[afterSave Pet] Info=\'Failed to set post properties for new pet\' error=' + e.message);
+			}
+			return;
 		}
-		return;
-	}
 
-	var pet = req.object;
-	//otherwise let's see what changed
-    var dirtyKeys = pet.get('lastDirtyKeys');
-    if(!dirtyKeys) {
-    	log.warn('[afterSave Pet] Info=\'No dirtyKeys\'');
-		return; 
- 	} 
+		var pet = req.object;
+		//otherwise let's see what changed
+	    var dirtyKeys = pet.get('lastDirtyKeys');
+	    if(!dirtyKeys) {
+	    	log.warn('[afterSave Pet] Info=\'No dirtyKeys\'');
+			return; 
+	 	} 
 
-	log.info('[afterSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' pet=' + pet.get('name') + 'petId=' + pet.id);
+		log.info('[afterSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' pet=' + pet.get('name') + 'petId=' + pet.id);
 
-	var toSave = [];
+		var toSave = [];
 
-	//collect info for posts
-	for (var i = 0; i < dirtyKeys.length; ++i) {
-		var dirtyKey = dirtyKeys[i];
-		switch(dirtyKey){
-			case 'profilePhoto':
-				log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty - queueing post\'');
-				//profilePhoto is the latest photo
-				try{
+		//collect info for posts
+		for (var i = 0; i < dirtyKeys.length; ++i) {
+			var dirtyKey = dirtyKeys[i];
+			switch(dirtyKey){
+				case 'profilePhoto':
+					log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty - queueing post\'');
+					//profilePhoto is the latest photo
+					try{
 
-					if(pet.get('numberPhotosAddedToday')>NEW_PHOTO_POSTS_PER_PET_PER_DAY){
-						log.debug('[afterSave Pet] Info=\'Pet already added too many photos today - not queueing post\'');
-						continue;
-					} 
+						if(pet.get('numberPhotosAddedToday')>NEW_PHOTO_POSTS_PER_PET_PER_DAY){
+							log.debug('[afterSave Pet] Info=\'Pet already added too many photos today - not queueing post\'');
+							continue;
+						} 
 
-					var PublishQueue = Parse.Object.extend('PublishQueue');
-					var queueItem = new PublishQueue;
+						var PublishQueue = Parse.Object.extend('PublishQueue');
+						var queueItem = new PublishQueue;
 
-					queueItem.set('type', 'newPetPhoto');
-					queueItem.set('req', req);
-					queueItem.set('causingUser', req.user); 
-					queueItem.set('aboutPet', pet);
-					queueItem.set('photo', pet.get('profilePhoto'));
-					toSave.push(queueItem);
-				} catch (e){
-					log.error('[afterSave Pet] Info=\'Failed to set post properties for profilePhoto update\' error=' + e.message);
-					return; 
-				}
-
-				break;
-			case 'lastFeedingLog':
-				log.debug('[afterSave Pet] Info=\'Pet lastFeedingLog is dirty - queueing post\'');
-				//we also need to send push notifications to all users who feed this pet
-				try{
-					var relation = pet.relation('owners');
-					var query = relation.query();
-				
-					query.find().then(function(results){
-						log.debug('[afterSave Pet] Info=\'Retrieving owners succeeded\' numberRetreived=' + results.length);
-						sendNotifications(results, 'fedPet', pet);
-					}, function(error){
-						log.debug('[afterSave Pet] Info=\'Retrieving owners failed\' error=' + error.message);
+						queueItem.set('type', 'newPetPhoto');
+						queueItem.set('req', req);
+						queueItem.set('causingUser', req.user); 
+						queueItem.set('aboutPet', pet);
+						queueItem.set('photo', pet.get('profilePhoto'));
+						toSave.push(queueItem);
+					} catch (e){
+						log.error('[afterSave Pet] Info=\'Failed to set post properties for profilePhoto update\' error=' + e.message);
 						return; 
-					});
-				} catch (e){
-					log.error('[afterSave Pet] Info=\'Failed to send push for lastFeedingLog update\' error=' + e.message);
-					return; 
-				}
+					}
 
-				//publish a post about it
-				try{
-					if(pet.get('numberFeedsToday')>FED_POSTS_PER_PET_PER_DAY){
-						log.debug('[afterSave Pet] Info=\'Pet already fed too many times today - not queueing post\'');
-						continue;
-					} 
+					break;
+				case 'lastFeedingLog':
+					log.debug('[afterSave Pet] Info=\'Pet lastFeedingLog is dirty - queueing post\'');
+					//we also need to send push notifications to all users who feed this pet
+					try{
+						var relation = pet.relation('owners');
+						var query = relation.query();
+					
+						query.find().then(function(results){
+							log.debug('[afterSave Pet] Info=\'Retrieving owners succeeded\' numberRetreived=' + results.length);
+							sendNotifications(results, 'fedPet', pet);
+						}, function(error){
+							log.debug('[afterSave Pet] Info=\'Retrieving owners failed\' error=' + error.message);
+							return; 
+						});
+					} catch (e){
+						log.error('[afterSave Pet] Info=\'Failed to send push for lastFeedingLog update\' error=' + e.message);
+						return; 
+					}
+
+					//publish a post about it
+					try{
+						if(pet.get('numberFeedsToday')>FED_POSTS_PER_PET_PER_DAY){
+							log.debug('[afterSave Pet] Info=\'Pet already fed too many times today - not queueing post\'');
+							continue;
+						} 
 
 
-					var PublishQueue = Parse.Object.extend('PublishQueue');
-					var queueItem = new PublishQueue;
+						var PublishQueue = Parse.Object.extend('PublishQueue');
+						var queueItem = new PublishQueue;
 
-					queueItem.set('type', 'fedPet');
-					queueItem.set('req', req);
-					queueItem.set('causingUser', pet.get('lastFeedingUser'));
-					queueItem.set('aboutPet', pet);
-					toSave.push(queueItem);
-				} catch (e){
-					log.error('[afterSave Pet] Info=\'Failed to set post properties for lastFeedingLog update\' error=' + e.message);
-					return; 
-				}
+						queueItem.set('type', 'fedPet');
+						queueItem.set('req', req);
+						queueItem.set('causingUser', pet.get('lastFeedingUser'));
+						queueItem.set('aboutPet', pet);
+						toSave.push(queueItem);
+					} catch (e){
+						log.error('[afterSave Pet] Info=\'Failed to set post properties for lastFeedingLog update\' error=' + e.message);
+						return; 
+					}
 
 
 
-				break;
-			case 'level':
-				log.debug('[afterSave Pet] Info=\'Pet level is dirty - queueing post\'');
-				//profilePhoto is the latest photo
-				try{
-					var PublishQueue = Parse.Object.extend('PublishQueue');
-					var queueItem = new PublishQueue;
+					break;
+				case 'level':
+					log.debug('[afterSave Pet] Info=\'Pet level is dirty - queueing post\'');
+					//profilePhoto is the latest photo
+					try{
+						var PublishQueue = Parse.Object.extend('PublishQueue');
+						var queueItem = new PublishQueue;
 
-					queueItem.set('type', 'levelUp');
-					queueItem.set('req', req);
-					queueItem.set('causingUser', req.user); 
-					queueItem.set('aboutPet', pet);
-					queueItem.set('newLevel', pet.get('level'));
-					toSave.push(queueItem);
-				} catch (e){
-					log.error('[afterSave Pet] Info=\'Failed to set post properties for level update\' error=' + e.message);
-					return; 
-				}
+						queueItem.set('type', 'levelUp');
+						queueItem.set('req', req);
+						queueItem.set('causingUser', req.user); 
+						queueItem.set('aboutPet', pet);
+						queueItem.set('newLevel', pet.get('level'));
+						toSave.push(queueItem);
+					} catch (e){
+						log.error('[afterSave Pet] Info=\'Failed to set post properties for level update\' error=' + e.message);
+						return; 
+					}
 
-				break;
-			default:
-				break;
+					break;
+				default:
+					break;
+			}
 		}
+		log.debug('[afterSave Pet] Info=\'Saving posts\' toSave.length=' + toSave.length);
+		Parse.Object.saveAll(toSave)
+	} catch (e){
+		log.error('[afterSave Pet] Info=\'Failed\' error=' + e.message);
+		return; 
 	}
-	log.debug('[afterSave Pet] Info=\'Saving posts\' toSave.length=' + toSave.length);
-	Parse.Object.saveAll(toSave)
 });
 
 Parse.Cloud.afterSave('Post', function(req) 

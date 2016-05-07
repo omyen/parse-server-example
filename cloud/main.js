@@ -722,7 +722,10 @@ Parse.Cloud.define('feedPet', function(req, res) {
 	var mPet;
 
 	//user doesn't wait on this, so we can do it all sequentially
-	queryPet.get(req.params.petId).then(
+	user.fetch().then(
+		function(user) {
+			return queryPet.get(req.params.petId);
+		}).then(
 		function(pet) {
 			log.debug('[feedPet] Info=\'Found pet from ID\' petname=' + pet.get('name'));
 			mPet = pet;
@@ -736,7 +739,7 @@ Parse.Cloud.define('feedPet', function(req, res) {
 			relation.add(feedingLog);
 			mPet.set('lastFeedingLog', feedingLog);
 			mPet.set('lastFeedingUser', user);
-			mPet.set('lastFedByName', user);
+			mPet.set('lastFedByName', user.get('displayName'));
 			return mPet.save();
 		}).then(function(pet){
 			log.debug('[feedPet] Info=\'Saved pet successfully\'');

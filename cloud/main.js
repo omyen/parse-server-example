@@ -736,6 +736,7 @@ Parse.Cloud.define('feedPet', function(req, res) {
 			relation.add(feedingLog);
 			mPet.set('lastFeedingLog', feedingLog);
 			mPet.set('lastFeedingUser', user);
+			mPet.set('lastFedByName', user);
 			return mPet.save();
 		}).then(function(pet){
 			log.debug('[feedPet] Info=\'Saved pet successfully\'');

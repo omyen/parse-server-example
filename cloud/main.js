@@ -271,7 +271,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 					log.error('[afterSave Pet] Info=\'Failed to send push for lastFeedingLog update\' error=' + e.message);
 					return; 
 				}
-				
+
 				try{
 					if(pet.get('numberFeedsToday')>FED_POSTS_PER_PET_PER_DAY){
 						log.debug('[afterSave Pet] Info=\'Pet already fed too many times today - not queueing post\'');
@@ -422,6 +422,25 @@ Parse.Cloud.define('checkInstallationExists', function(request, response)
       } else {
       	response.success(false);
       }
+    }, function(error){
+    	response.error(error.message);
+    });
+});
+
+Parse.Cloud.define('updatePushChannels', function(request, response) 
+{
+	Parse.Cloud.useMasterKey();
+	var installationQuery = (new Parse.Query(Parse.Installation))
+        .equalTo('installationId', request.params.installationId);
+    installationQuery.find().then(function(result){
+      if(result.length>0){
+        result[0].set('channels', request.params.channels);
+        return result[0].save();
+      } else {
+      	response.error("Installation id not found - did you forget to initialize the push service?");
+      }
+    }).then(function(result){
+    	response.success(true);
     }, function(error){
     	response.error(error.message);
     });

@@ -256,6 +256,43 @@ Parse.Cloud.afterSave('Pet', function(req)
 					return; 
 				}
 
+				//we also need to send push notifications to all users who feed this pet
+				try{
+					var relation = pet.relation('owners');
+					var query = relation.query();
+				
+					query.find().then(function(results){
+						log.debug('[afterSave Pet] Info=\'Retrieving owners succeeded\' numberRetreived=' + results.length);
+						//make an array of channels (==user ids)
+						var channels = [];
+						for (var i = 0; i < results.length; ++i) {
+							channels.push(results[i].id)
+						}
+						Parse.Push.send({
+						  channels: channels,
+						  data: {
+						    alert: 'Test',
+						    badge: 1,
+						    sound: 'default'
+						  }
+						}, {
+						  success: function() {
+						    log.debug('##### PUSH OK');
+						  },
+						  error: function(error) {
+						    log.debug('##### PUSH ERROR');
+						  },
+						  useMasterKey: true
+						});
+					}, function(error){
+						log.debug('[afterSave Pet] Info=\'Retrieving owners failed\' error=' + error.message);
+						return; 
+					});
+				} catch (e){
+					log.error('[afterSave Pet] Info=\'Failed to send push for lastFeedingLog update\' error=' + e.message);
+					return; 
+				}
+
 				break;
 			case 'level':
 				log.debug('[afterSave Pet] Info=\'Pet level is dirty - queueing post\'');

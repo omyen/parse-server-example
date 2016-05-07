@@ -375,6 +375,7 @@ Parse.Cloud.afterSave("Photo", function(request) {
 
 Parse.Cloud.define('checkInstallationExists', function(request, response) 
 {
+	Parse.Cloud.useMasterKey();
 	var installationQuery = (new Parse.Query(Parse.Installation))
         .equalTo('installationId', request.params.installationId);
     installationQuery.find().then(function(result){

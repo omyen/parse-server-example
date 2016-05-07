@@ -527,7 +527,9 @@ Parse.Cloud.define('updateNotificationPreference', function(request, response)
 	        .equalTo('user', request.params.user);
 	    installationQuery.find().then(function(result){
 	      if(result.length>0){
+	      	log.debug("[updateNotificationPreference] Info=\'Installation records found\' numberFound" + result.length);
 	      	for(var i=0; i<result.length; ++i){
+	      		log.debug("[updateNotificationPreference] Info=\'Setting notifications pref on installation record\' i" + i);
 	      		result[i].set('sendNotifications', request.params.sendNotifications);
 	      	}
 	        return Parse.Object.saveAll(result);

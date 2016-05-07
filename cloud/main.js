@@ -12,13 +12,15 @@ var NEW_PHOTO_POSTS_PER_PET_PER_DAY = 1;
 
 //==============================
 //helper functions
-function sendPushes(users, type, extraData){
+function sendPushes(users, initiatingUser, type, extraData){
 	try{
 		log.debug('[sendPushes] type=' + type);
 		//make an array of ids
 		var ids = [];
 		for (var i = 0; i < users.length; ++i) {
-			ids.push(users[i].id)
+			if(users[i].id != initiatingUser.id){
+				ids.push(users[i].id)
+			}
 		}
 
 		var alert;
@@ -315,7 +317,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 					
 						query.find().then(function(results){
 							log.debug('[afterSave Pet] Info=\'Retrieving owners succeeded\' numberRetreived=' + results.length);
-							sendPushes(results, 'fedPet', pet);
+							sendPushes(results, pet.get('lastFedBy'), 'fedPet', pet);
 						}, function(error){
 							log.debug('[afterSave Pet] Info=\'Retrieving owners failed\' error=' + error.message);
 							return; 
@@ -634,6 +636,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	user.set('displayName_lowercase', req.params.username.toLowerCase()); //for searching
 	user.set('password', req.params.password);
 	user.set('tagline', '');
+	user.set('notifications', true);
 	promises.push(user.signUp());
 
 	var Post = Parse.Object.extend('Post');

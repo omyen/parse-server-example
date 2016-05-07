@@ -26,7 +26,7 @@ function sendPushes(users, type, extraData){
 		switch(type){
 			case 'fedPet':
 				alert = 'Someone fed one of your pets';
-				details.pet = pet;
+				details.pet = extraData;
 				break;
 			default:
 				return;

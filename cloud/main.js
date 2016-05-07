@@ -14,6 +14,7 @@ var NEW_PHOTO_POSTS_PER_PET_PER_DAY = 1;
 //helper functions
 function sendPushes(users, type, extraData){
 	try{
+		log.debug('[sendPushes] type=' + type);
 		//make an array of ids
 		var ids = [];
 		for (var i = 0; i < users.length; ++i) {

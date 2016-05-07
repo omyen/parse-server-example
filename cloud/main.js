@@ -373,6 +373,21 @@ Parse.Cloud.afterSave("Photo", function(request) {
 
 //==============================
 
+Parse.Cloud.define('checkInstallationExists', function(request, response) 
+{
+	var installationQuery = (new Parse.Query(Parse.Installation))
+        .equalTo('installationId', id);
+    installationQuery.find().then(function(result){
+      if(result.length>0){
+        response.success(true);
+      } else {
+      	response.success(false);
+      }
+    }, function(error){
+    	response.error(error.message);
+    });
+});
+
 Parse.Cloud.define('checkPassword', function(request, response) 
 {
     var password = request.params.password;

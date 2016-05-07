@@ -33,7 +33,18 @@ var api = new ParseServer({
       domain: process.env.MAILGUN_DOMAIN,
       fromAddress: 'noreply@' + process.env.MAILGUN_DOMAIN
     }
-  }
+  },
+  push: {
+      android: {
+        senderId: process.env.GCM_SENDER_ID,
+        apiKey: process.env.GCM_API_KEY
+      }//,
+      // ios: {
+      //   pfx: '/file/path/to/XXX.p12',
+      //   bundleId: '',
+      //   production: false
+      // }
+    }
 });
 // Client-keys like the javascript key or the .NET key are not necessary with parse-server
 // If you wish you require them, you can set them as options in the initialization above:

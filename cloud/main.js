@@ -26,7 +26,7 @@ function sendPushes(users, type, extraData){
 		switch(type){
 			case 'fedPet':
 				alert = 'Someone fed one of your pets';
-				details.petId = extraData.id;
+				details.pet = pet;
 				break;
 			default:
 				return;
@@ -497,6 +497,7 @@ Parse.Cloud.define('updatePushChannels', function(request, response)
 
 Parse.Cloud.define('updatePushUser', function(request, response) 
 {
+	log.debug("[updatePushUser] Info=\'Running cloud code\'");
 	try{
 		Parse.Cloud.useMasterKey();
 		var installationQuery = (new Parse.Query(Parse.Installation))
@@ -505,9 +506,7 @@ Parse.Cloud.define('updatePushUser', function(request, response)
 	      if(results.length>0){
 	      	log.debug("[updatePushUser] Info=\'Installation records found\' numberFound" + results.length);
 	      	installation = results[0];
-	      	installation.set('test', 'butts');
 	        installation.set('user', request.params.user);
-	        log.debug('test=' + installation.get('test'));
 	        return installation.save();
 	      } else {
 	      	log.error("[updatePushUser] Info=\'Installation records not found\' numberFound" + results.length);

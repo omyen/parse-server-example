@@ -13,66 +13,70 @@ var NEW_PHOTO_POSTS_PER_PET_PER_DAY = 1;
 //==============================
 //helper functions
 function sendPushes(users, type, extraData){
-	//make an array of ids
-	var ids = [];
-	for (var i = 0; i < users.length; ++i) {
-		ids.push(users[i].id)
+	try{
+		//make an array of ids
+		var ids = [];
+		for (var i = 0; i < users.length; ++i) {
+			ids.push(users[i].id)
+		}
+
+		var alert;
+		var details = {};
+		switch(type){
+			case 'fedPet':
+				alert = 'Someone fed one of your pets';
+				details.petId = extraData.id;
+				break;
+			default:
+				return;
+		}
+
+		//send a full notification to all users who want it
+		var query = new Parse.Query(Parse.Installation);
+		query.containedIn('user', ids);
+		query.equalTo('sendNotifications', true);
+
+		Parse.Push.send({
+		  where: query,
+		  data: {
+		  	title: 'DoubleDip',
+		    alert: alert,
+		    type: type,
+		    details: details
+		  }
+		}, {
+		  success: function() {
+		    log.debug('##### PUSH OK');
+		  },
+		  error: function(error) {
+		    log.debug('##### PUSH ERROR');
+		  },
+		  useMasterKey: true
+		});
+
+		//now send a simple push to those who don't 
+		query = new Parse.Query(Parse.Installation);
+		query.containedIn('user', ids);
+		query.equalTo('sendNotifications', false);
+
+		Parse.Push.send({
+		  where: query,
+		  data: {
+		  	type: type,
+		  	details: details
+		  }
+		}, {
+		  success: function() {
+		    log.debug('##### PUSH OK');
+		  },
+		  error: function(error) {
+		    log.debug('##### PUSH ERROR');
+		  },
+		  useMasterKey: true
+		});
+	} catch (e){
+		log.error('[sendPushes] Info=\'Failed\' error=' + e.message);
 	}
-
-	var alert;
-	var details = {};
-	switch(type){
-		case 'fedPet':
-			alert = 'Someone fed one of your pets';
-			details.petId = extraData.id;
-			break;
-		default:
-			return;
-	}
-
-	//send a full notification to all users who want it
-	var query = new Parse.Query(Parse.Installation);
-	query.containedIn('user', ids);
-	query.equalTo('sendNotifications', true);
-
-	Parse.Push.send({
-	  where: query,
-	  data: {
-	  	title: 'DoubleDip',
-	    alert: alert,
-	    type: type,
-	    details: details
-	  }
-	}, {
-	  success: function() {
-	    log.debug('##### PUSH OK');
-	  },
-	  error: function(error) {
-	    log.debug('##### PUSH ERROR');
-	  },
-	  useMasterKey: true
-	});
-
-	//now send a simple push to those who don't 
-	query = new Parse.Query(Parse.Installation);
-	query.containedIn('user', ids);
-	query.equalTo('sendNotifications', false);
-
-	Parse.Push.send({
-	  where: query,
-	  data: {
-	  	type: type,
-	  	details: details
-	  }
-	}, {
-	  success: function() {
-	    log.debug('##### PUSH OK');
-	  },
-	  error: function(error) {
-	    log.debug('##### PUSH ERROR');
-	  },
-	  useMasterKey: true
-	});
 } 
 
 //==============================

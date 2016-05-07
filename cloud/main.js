@@ -250,7 +250,8 @@ Parse.Cloud.afterSave('Pet', function(req)
 						Parse.Push.send({
 						  channels: channels,
 						  data: {
-						    alert: 'Test',
+						  	title: 'DoubleDip',
+						    alert: 'Someone fed one of your pets',
 						    badge: 1,
 						    sound: 'default'
 						  }
@@ -272,6 +273,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 					return; 
 				}
 
+				//publish a post about it
 				try{
 					if(pet.get('numberFeedsToday')>FED_POSTS_PER_PET_PER_DAY){
 						log.debug('[afterSave Pet] Info=\'Pet already fed too many times today - not queueing post\'');

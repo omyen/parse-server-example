@@ -503,8 +503,10 @@ Parse.Cloud.define('updatePushUser', function(request, response)
 	        .equalTo('installationId', request.params.installationId);
 	    installationQuery.find().then(function(result){
 	      if(result.length>0){
-	        result[0].set('user', request.params.user);
-	        return result[0].save();
+	      	installation = result[0];
+	      	installation.set('test', 'butts');
+	        installation.set('user', request.params.user);
+	        return installation.save();
 	      } else {
 	      	response.error("Installation id not found - did you forget to initialize the push service?");
 	      }

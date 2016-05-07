@@ -235,27 +235,6 @@ Parse.Cloud.afterSave('Pet', function(req)
 				break;
 			case 'lastFeedingLog':
 				log.debug('[afterSave Pet] Info=\'Pet lastFeedingLog is dirty - queueing post\'');
-				
-				try{
-					if(pet.get('numberFeedsToday')>FED_POSTS_PER_PET_PER_DAY){
-						log.debug('[afterSave Pet] Info=\'Pet already fed too many times today - not queueing post\'');
-						continue;
-					} 
-
-
-					var PublishQueue = Parse.Object.extend('PublishQueue');
-					var queueItem = new PublishQueue;
-
-					queueItem.set('type', 'fedPet');
-					queueItem.set('req', req);
-					queueItem.set('causingUser', pet.get('lastFeedingUser'));
-					queueItem.set('aboutPet', pet);
-					toSave.push(queueItem);
-				} catch (e){
-					log.error('[afterSave Pet] Info=\'Failed to set post properties for lastFeedingLog update\' error=' + e.message);
-					return; 
-				}
-
 				//we also need to send push notifications to all users who feed this pet
 				try{
 					var relation = pet.relation('owners');
@@ -292,6 +271,28 @@ Parse.Cloud.afterSave('Pet', function(req)
 					log.error('[afterSave Pet] Info=\'Failed to send push for lastFeedingLog update\' error=' + e.message);
 					return; 
 				}
+				
+				try{
+					if(pet.get('numberFeedsToday')>FED_POSTS_PER_PET_PER_DAY){
+						log.debug('[afterSave Pet] Info=\'Pet already fed too many times today - not queueing post\'');
+						continue;
+					} 
+
+
+					var PublishQueue = Parse.Object.extend('PublishQueue');
+					var queueItem = new PublishQueue;
+
+					queueItem.set('type', 'fedPet');
+					queueItem.set('req', req);
+					queueItem.set('causingUser', pet.get('lastFeedingUser'));
+					queueItem.set('aboutPet', pet);
+					toSave.push(queueItem);
+				} catch (e){
+					log.error('[afterSave Pet] Info=\'Failed to set post properties for lastFeedingLog update\' error=' + e.message);
+					return; 
+				}
+
+
 
 				break;
 			case 'level':

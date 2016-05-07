@@ -315,7 +315,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 					
 						query.find().then(function(results){
 							log.debug('[afterSave Pet] Info=\'Retrieving owners succeeded\' numberRetreived=' + results.length);
-							sendNotifications(results, 'fedPet', pet);
+							sendPushes(results, 'fedPet', pet);
 						}, function(error){
 							log.debug('[afterSave Pet] Info=\'Retrieving owners failed\' error=' + error.message);
 							return; 

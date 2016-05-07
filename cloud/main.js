@@ -501,14 +501,16 @@ Parse.Cloud.define('updatePushUser', function(request, response)
 		Parse.Cloud.useMasterKey();
 		var installationQuery = (new Parse.Query(Parse.Installation))
 	        .equalTo('installationId', request.params.installationId);
-	    installationQuery.find().then(function(result){
-	      if(result.length>0){
-	      	installation = result[0];
+	    installationQuery.find().then(function(results){
+	      if(results.length>0){
+	      	log.debug("[updatePushUser] Info=\'Installation records found\' numberFound" + results.length);
+	      	installation = results[0];
 	      	installation.set('test', 'butts');
 	        installation.set('user', request.params.user);
 	        log.debug('test=' + installation.get('test'));
 	        return installation.save();
 	      } else {
+	      	log.error("[updatePushUser] Info=\'Installation records not found\' numberFound" + results.length);
 	      	response.error("Installation id not found - did you forget to initialize the push service?");
 	      }
 	    }).then(function(result){
@@ -528,14 +530,14 @@ Parse.Cloud.define('updateNotificationPreference', function(request, response)
 		Parse.Cloud.useMasterKey();
 		var installationQuery = (new Parse.Query(Parse.Installation))
 	        .equalTo('user', request.params.user);
-	    installationQuery.find().then(function(result){
-	      if(result.length>0){
-	      	log.debug("[updateNotificationPreference] Info=\'Installation records found\' numberFound" + result.length);
-	      	for(var i=0; i<result.length; ++i){
+	    installationQuery.find().then(function(results){
+	      if(results.length>0){
+	      	log.debug("[updateNotificationPreference] Info=\'Installation records found\' numberFound" + results.length);
+	      	for(var i=0; i<results.length; ++i){
 	      		log.debug("[updateNotificationPreference] Info=\'Setting notifications pref on installation record\' i" + i);
-	      		result[i].set('sendNotifications', request.params.sendNotifications);
+	      		results[i].set('sendNotifications', request.params.sendNotifications);
 	      	}
-	        return Parse.Object.saveAll(result);
+	        return Parse.Object.saveAll(results);
 	      } else {
 	      	response.error("User not found in installation ids - did you forget to log in a user in the app?");
 	      }

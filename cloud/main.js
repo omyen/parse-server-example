@@ -30,6 +30,17 @@ function sendPushes(users, initiatingUser, type, extraData){
 				alert = 'Someone fed one of your pets';
 				details.pet = extraData;
 				break;
+			case 'newFriend':
+				alert = 'You have a new friend';
+				details.friend = extraData;
+				break;
+			case 'newFriendRequest':
+				alert = 'You have a new friend request';
+				details.friendRequest = extraData;
+				break;
+			case 'newPost':
+				alert = 'You have a new posts';
+				break;
 			default:
 				return;
 		}
@@ -755,7 +766,7 @@ Parse.Cloud.define('feedPet', function(req, res) {
 
 Parse.Cloud.define('addFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	log.info('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);
+	log.info('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId + ' calledBy=' req.params.calledById);
 
 	var FriendRequest = Parse.Object.extend('FriendRequest');
 	var User = Parse.Object.extend('_User');
@@ -770,6 +781,9 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	
 	var requested = new User;
 	requested.id = req.params.requestedId;
+
+	var calledBy = new User;
+	calledBy = req.params.calledById;
 	
 	
 	requester.relation('friends').add(requested);
@@ -777,7 +791,15 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	
 	var toSave = [requester,requested];
 	
-	Parse.Object.saveAll(toSave).then(
+	requester.fetch().then(
+		function(result){
+			return requested.fetch;
+		}).then(
+		function(result){
+			sendPushes([requester.id], calledBy, 'newFriend', requested);
+			sendPushes([requested.id], calledBy, 'newFriend', requester);
+			return Parse.Object.saveAll(toSave);
+		}).then(
 		function(result) {
 			log.debug('[addFriend] Info=\'addFriend complete\'');
 			res.success('OK');

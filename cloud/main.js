@@ -393,6 +393,25 @@ Parse.Cloud.afterSave('Pet', function(req)
 	}
 });
 
+Parse.Cloud.afterSave('FriendRequest', function(req) 
+{	
+	try{
+		friendRequest = req.object;
+		//first check to see if it's new
+		if(!friendRequest.existed()){
+			try{
+				sendPushes([friendRequest.get('requested')], friendRequest.get('requester'), 'newFriendRequest', friendRequest);
+			} catch (e){
+				log.error('[afterSave FriendRequest] Info=\'Failed to send push\' error=' + e.message);
+			}
+			return;
+		}
+	} catch (e){
+		log.error('[afterSave FriendRequest] Info=\'Failed\' error=' + e.message);
+		return; 
+	}
+});
+
 Parse.Cloud.afterSave('Post', function(req) 
 {
 	Parse.Cloud.useMasterKey();

@@ -785,10 +785,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	var calledBy = new User;
 	calledBy = req.params.calledById;
 	
-	
-	requester.relation('friends').add(requested);
-	requested.relation('friends').add(requester);
-	
+
 	var toSave = [requester,requested];
 	
 	requester.fetch().then(
@@ -798,6 +795,8 @@ Parse.Cloud.define('addFriend', function(req, res) {
 		function(result){
 			sendPushes([requester], calledBy, 'newFriend', requested);
 			sendPushes([requested], calledBy, 'newFriend', requester);
+			requester.relation('friends').add(requested);
+			requested.relation('friends').add(requester);
 			return Parse.Object.saveAll(toSave);
 		}).then(
 		function(result) {

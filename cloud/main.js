@@ -796,8 +796,8 @@ Parse.Cloud.define('addFriend', function(req, res) {
 			return requested.fetch;
 		}).then(
 		function(result){
-			sendPushes([requester.id], calledBy, 'newFriend', requested);
-			sendPushes([requested.id], calledBy, 'newFriend', requester);
+			sendPushes([requester], calledBy, 'newFriend', requested);
+			sendPushes([requested], calledBy, 'newFriend', requester);
 			return Parse.Object.saveAll(toSave);
 		}).then(
 		function(result) {

@@ -766,7 +766,7 @@ Parse.Cloud.define('feedPet', function(req, res) {
 
 Parse.Cloud.define('addFriend', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	log.info('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId + ' calledBy=' req.params.calledById);
+	log.info('[addFriend] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId + ' calledBy=' + req.params.calledById);
 
 	var FriendRequest = Parse.Object.extend('FriendRequest');
 	var User = Parse.Object.extend('_User');

@@ -320,6 +320,10 @@ function resetXPDailies(){
 	
 }
 
+function sendFeedReminders(){
+	log.info('[sendFeedReminders] Info=\'Running\'');
+}
+
 //======================
 //set up cron job
 var CronJob = require('cron').CronJob;
@@ -330,6 +334,14 @@ new CronJob({
   start: true,
   timeZone: "America/Los_Angeles"
 });
+
+new CronJob({
+  cronTime: "0 */15 * * * *",//every 15 minutes
+  onTick: sendFeedReminders,
+  start: true,
+  timeZone: "America/Los_Angeles"
+});
+
 
 new CronJob({
   cronTime: "15 1 0 * * *",//15 seconds after minute one of hour 0 of every day

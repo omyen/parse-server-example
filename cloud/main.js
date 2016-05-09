@@ -390,7 +390,11 @@ Parse.Cloud.afterSave('Pet', function(req)
 					query.find().then(function(feedingReminders){
 						//then destroy them all 
 						log.debug('[afterSave Pet] Info=\'Found some feedingReminders - deleting them\' number=' + feedingReminders.length);
-						return Parse.Object.destroyAll(feedingReminders);
+						if(feedingReminders.length>0){
+							return Parse.Object.destroyAll(feedingReminders);
+						} else {
+							return Parse.Promise.resolve();
+						}
 					}).then(function(result){
 						//then add all the new ones
 						for(var i=0; i<pet.get('feedtimes').length; i++){

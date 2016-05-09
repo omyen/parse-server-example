@@ -2,6 +2,7 @@
 var express = require('express');
 var crypto = require('crypto');
 var log = require('loglevel');
+var moment = require('moment-timezone');
 
 log.setLevel('debug');
 
@@ -394,7 +395,11 @@ Parse.Cloud.afterSave('Pet', function(req)
 						for(var i=0; i<pet.get('feedtimes').length; i++){
 							var feedingReminder = new FeedingReminder();
 							feedingReminder.set('pet', pet);
-							feedingReminder.set('secondsGMT', pet.get('feedtimes')[i] + (pet.get('timezoneOffsetMinutes')*60));
+							var zone = moment.tz.zone(pet.get('timezone')); 
+							var offset = zone.parse(new Date());
+							feedingReminder.set('offset', offset);
+							feedingReminder.set('timezone', pet.get('timezone'));
+							feedingReminder.set('minutes', pet.get('feedtimes')[i] - offset);
 							feedingRemindersToSave.push(feedingReminder);
 						}
 						return Parse.Object.saveAll(feedingRemindersToSave);

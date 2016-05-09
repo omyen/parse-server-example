@@ -389,10 +389,12 @@ Parse.Cloud.afterSave('Pet', function(req)
 					query.equalTo('pet', pet);
 					query.find().then(function(feedingReminders){
 						//then destroy them all 
+						log.debug('[afterSave Pet] Info=\'Found some feedingReminders - deleting them\' number=' + feedingReminders.length);
 						return Parse.Object.destroyAll(feedingReminders);
 					}).then(function(result){
 						//then add all the new ones
 						for(var i=0; i<pet.get('feedtimes').length; i++){
+							log.debug('[afterSave Pet] Info=\'Adding new feedingReminder\'  feedtime=' +  pet.get('feedtimes')[i]);
 							var feedingReminder = new FeedingReminder();
 							feedingReminder.set('pet', pet);
 							var zone = moment.tz.zone(pet.get('timezone')); 

@@ -320,8 +320,88 @@ function resetXPDailies(){
 	
 }
 
+function sendPushes(users, initiatingUser, type, extraData){
+	try{
+		log.debug('[sendPushes] type=' + type);
+		//make an array of ids
+		var ids = [];
+		for (var i = 0; i < users.length; ++i) {
+			if(users[i].id != initiatingUser.id){
+				ids.push(users[i].id)
+			}
+		}
+
+		var alert;
+		var details = {};
+		switch(type){
+			case 'feedingReminder':
+				alert = extraData.get('name') + ' hasn\'t been fed yet';
+				details.pet = extraData;
+				break;
+			default:
+				return;
+		}
+
+		//send a full notification to all users who want it
+		var query = new Parse.Query(Parse.Installation);
+		query.containedIn('user', ids);
+		query.equalTo('sendNotifications', true);
+
+		Parse.Push.send({
+		  where: query,
+		  data: {
+		  	title: 'DoubleDip',
+		    alert: alert,
+		    type: type,
+		    details: details
+		  }
+		}, {
+		  success: function() {
+		    log.debug('##### PUSH OK');
+		  },
+		  error: function(error) {
+		    log.debug('##### PUSH ERROR');
+		  },
+		  useMasterKey: true
+		});
+	} catch (e){
+		log.error('[sendPushes] Info=\'Failed\' error=' + e.message);
+	}
+} 
+
 function sendFeedReminders(){
 	log.info('[sendFeedReminders] Info=\'Running\'');
+	var now = new Date();
+	var utcHours = new.getUTCHours();
+	var utcMinutes = new.getUTCMinutes();
+	var utcTimeMinutes = utcMinutes + 60*utcHours;
+	var utcTimeMinutesMin = (utcTimeMinutes-7)%1440;
+	var utcTimeMinutesMax = (utcTimeMinutes+8)%1440;
+
+	var FeedingReminder = Parse.Object.extend('FeedingReminder');
+	var query = new Parse.Query(FeedingReminder);
+	if(utcTimeMinutesMin<utcTimeMinutesMax){
+		query.lessThan('minutes', utcTimeMinutesMax);
+		query.greaterThan('minutes', utcTimeMinutesMin);
+	} else {
+		//must be across midnight
+		var queryLess = new Parse.Query(FeedingReminder);
+		var queryMore = new Parse.Query(FeedingReminder);
+		queryLess.lessThan('minutes', utcTimeMinutesMax);
+		queryMore.greaterThan('minutes', utcTimeMinutesMin);
+		query = Parse.Query.or(queryLess, queryMore);
+	}
+
+	query.find().then(function(feedingReminders){
+		log.info('[sendFeedReminders] Info=\'Got feedingReminders\' length=' + feedingReminders.length);
+		for(var i = 0; i<feedingReminders.length; i++){
+			var queryOwners = feedingReminders[i].get('pet').relation('owners').query();
+			queryOwners.find().then(function(owners){
+				var dummy = {};
+				sendPushes(owners, dummy, 'feedingReminder', feedingReminders[i].get('pet'));
+			}
+		}
+	}
 }
 
 //======================

@@ -396,6 +396,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 							return Parse.Promise.resolve();
 						}
 					}).then(function(result){
+						log.debug('[afterSave Pet] Info=\'Adding new feedingReminders\'  number=' +  pet.get('feedtimes').length);
 						//then add all the new ones
 						for(var i=0; i<pet.get('feedtimes').length; i++){
 							log.debug('[afterSave Pet] Info=\'Adding new feedingReminder\'  feedtime=' +  pet.get('feedtimes')[i]);
@@ -409,6 +410,8 @@ Parse.Cloud.afterSave('Pet', function(req)
 							feedingRemindersToSave.push(feedingReminder);
 						}
 						return Parse.Object.saveAll(feedingRemindersToSave);
+					}, function(error){
+						log.debug('[afterSave Pet] Info=\'Failed adding feedingReminders\'  error=' +  error.message);
 					})
 					break;
 				default:

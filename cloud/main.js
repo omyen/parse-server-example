@@ -398,6 +398,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 							return Parse.Promise.as(true);
 						}
 					}).then(function(result){
+						log.debug('[afterSave Pet] Info=\'Adding new feedingReminders\'');
 						log.debug('[afterSave Pet] Info=\'Adding new feedingReminders\'  number=' +  pet.get('feedtimes').length);
 						//then add all the new ones
 						for(var i=0; i<pet.get('feedtimes').length; i++){

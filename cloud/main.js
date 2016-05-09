@@ -398,18 +398,17 @@ Parse.Cloud.afterSave('Pet', function(req)
 							return Parse.Promise.as(true);
 						}
 					}).then(function(result){
-						log.debug('[afterSave Pet] Info=\'Adding new feedingReminders\'');
-						log.debug('[afterSave Pet] Info=\'Adding new feedingReminders\'  number=' +  pet.get('feedtimes').length);
+						log.debug('[afterSave Pet] Info=\'Adding new feedingReminders\'  number=' +  pet.get('feedTimes').length);
 						//then add all the new ones
-						for(var i=0; i<pet.get('feedtimes').length; i++){
-							log.debug('[afterSave Pet] Info=\'Adding new feedingReminder\'  feedtime=' +  pet.get('feedtimes')[i]);
+						for(var i=0; i<pet.get('feedTimes').length; i++){
+							log.debug('[afterSave Pet] Info=\'Adding new feedingReminder\'  feedTime=' +  pet.get('feedTimes')[i]);
 							var feedingReminder = new FeedingReminder();
 							feedingReminder.set('pet', pet);
 							var zone = moment.tz.zone(pet.get('timezone')); 
 							var offset = zone.parse(new Date());
 							feedingReminder.set('offset', offset);
 							feedingReminder.set('timezone', pet.get('timezone'));
-							feedingReminder.set('minutes', pet.get('feedtimes')[i] - offset);
+							feedingReminder.set('minutes', pet.get('feedTimes')[i] - offset);
 							feedingRemindersToSave.push(feedingReminder);
 						}
 						return Parse.Object.saveAll(feedingRemindersToSave);

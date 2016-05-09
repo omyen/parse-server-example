@@ -369,6 +369,14 @@ function sendPushes(users, initiatingUser, type, extraData){
 	}
 } 
 
+function sendFeedRemindersToOwners(feedingReminder){
+	var queryOwners = feedingReminder.get('pet').relation('owners').query();
+	queryOwners.find().then(function(owners){
+		var dummy = {};
+		sendPushes(owners, dummy, 'feedingReminder', feedingReminder.get('pet'));
+	});
+}
+
 function sendFeedReminders(){
 	log.info('[sendFeedReminders] Info=\'Running\'');
 	var now = new Date();
@@ -392,14 +400,13 @@ function sendFeedReminders(){
 		query = Parse.Query.or(queryLess, queryMore);
 	}
 
+	var scopeFeedingReminders;
+
 	query.find().then(function(feedingReminders){
 		log.info('[sendFeedReminders] Info=\'Got feedingReminders\' length=' + feedingReminders.length);
+		scopeFeedingReminders = feedingReminders;
 		for(var i = 0; i<feedingReminders.length; i++){
-			var queryOwners = feedingReminders[i].get('pet').relation('owners').query();
-			queryOwners.find().then(function(owners){
-				var dummy = {};
-				sendPushes(owners, dummy, 'feedingReminder', feedingReminders[i].get('pet'));
-			});
+			sendFeedRemindersToOwners(feedingReminders[i]);
 		}
 	});
 }

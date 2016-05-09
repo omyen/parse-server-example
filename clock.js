@@ -399,6 +399,7 @@ function sendFeedReminders(){
 		queryMore.greaterThan('minutes', utcTimeMinutesMin);
 		query = Parse.Query.or(queryLess, queryMore);
 	}
+	query.include('pet');
 
 	var scopeFeedingReminders;
 

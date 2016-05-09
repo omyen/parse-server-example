@@ -372,8 +372,8 @@ function sendPushes(users, initiatingUser, type, extraData){
 function sendFeedReminders(){
 	log.info('[sendFeedReminders] Info=\'Running\'');
 	var now = new Date();
-	var utcHours = new.getUTCHours();
-	var utcMinutes = new.getUTCMinutes();
+	var utcHours = now.getUTCHours();
+	var utcMinutes = now.getUTCMinutes();
 	var utcTimeMinutes = utcMinutes + 60*utcHours;
 	var utcTimeMinutesMin = (utcTimeMinutes-7)%1440;
 	var utcTimeMinutesMax = (utcTimeMinutes+8)%1440;

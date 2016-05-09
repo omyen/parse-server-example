@@ -389,10 +389,12 @@ Parse.Cloud.afterSave('Pet', function(req)
 					query.equalTo('pet', pet);
 					query.find().then(function(feedingReminders){
 						//then destroy them all 
-						log.debug('[afterSave Pet] Info=\'Found some feedingReminders - deleting them\' number=' + feedingReminders.length);
+						//log.debug('[afterSave Pet] Info=\'Found some feedingReminders - deleting them\' number=' + feedingReminders.length);
 						if(feedingReminders.length>0){
+							log.debug('[afterSave Pet] Info=\'Found some feedingReminders - deleting them\' number=' + feedingReminders.length);
 							return Parse.Object.destroyAll(feedingReminders);
 						} else {
+							log.debug('[afterSave Pet] Info=\'Found no feedingReminders - proceeding\'');
 							var dummy = {};
 							return Parse.Promise.resolve(dummy);
 						}

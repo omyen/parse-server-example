@@ -408,7 +408,8 @@ Parse.Cloud.afterSave('Pet', function(req)
 							var offset = zone.parse(new Date());
 							feedingReminder.set('offset', offset);
 							feedingReminder.set('timezone', pet.get('timezone'));
-							feedingReminder.set('minutes', pet.get('feedTimes')[i] - offset);
+							var minutes = Math.floor(pet.get('feedTimes')[i]/60);
+							feedingReminder.set('minutes', minutes - offset);
 							feedingRemindersToSave.push(feedingReminder);
 						}
 						return Parse.Object.saveAll(feedingRemindersToSave);

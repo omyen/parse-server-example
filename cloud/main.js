@@ -30,20 +30,20 @@ function sendPushes(users, initiatingUser, type, extraData){
 			case 'fedPet':
 				alert = 'Someone fed one of your pets';
 				details.pet = extraData;
-				goToState = 'tabs.pets_pets'
+				details.goToState = 'tabs.pets_pets'
 				break;
 			case 'newFriend':
 				alert = 'You have a new friend';
 				details.friend = extraData;
-				goToState = 'tabs.friends_friends'
+				details.goToState = 'tabs.friends_friends'
 				break;
 			case 'newFriendRequest':
 				alert = 'You have a new friend request';
 				details.friendRequest = extraData;
-				goToState = 'tabs.friends_friends'
+				details.goToState = 'tabs.friends_friends'
 				break;
 			case 'newPost':
-				alert = 'You have a new posts';
+				alert = 'You have new posts';
 				break;
 			default:
 				return;

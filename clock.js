@@ -399,9 +399,9 @@ function sendFeedReminders(){
 			queryOwners.find().then(function(owners){
 				var dummy = {};
 				sendPushes(owners, dummy, 'feedingReminder', feedingReminders[i].get('pet'));
-			}
+			});
 		}
-	}
+	});
 }
 
 //======================

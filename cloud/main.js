@@ -395,8 +395,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 							return Parse.Object.destroyAll(feedingReminders);
 						} else {
 							log.debug('[afterSave Pet] Info=\'Found no feedingReminders - proceeding\'');
-							var dummy = {};
-							return Parse.Promise.resolve(dummy);
+							return Parse.Promise.as(true);
 						}
 					}).then(function(result){
 						log.debug('[afterSave Pet] Info=\'Adding new feedingReminders\'  number=' +  pet.get('feedtimes').length);

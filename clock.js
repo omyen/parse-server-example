@@ -95,7 +95,14 @@ function publishFedPet(post, queueItem){
 		post.set('type', 'fedPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
-		post.set('text', queueItem.get('aboutPet').get('name') + ' has been fed ' + queueItem.get('aboutPet').get('numberFeeds') + ' times');
+		if(queueItem.get('aboutPet').get('numberFeeds')==1){
+			post.set('text', queueItem.get('aboutPet').get('name') + ' has been fed once');
+		} else if (queueItem.get('aboutPet').get('numberFeeds')==2){
+			post.set('text', queueItem.get('aboutPet').get('name') + ' has been fed twice');
+		} else {
+			post.set('text', queueItem.get('aboutPet').get('name') + ' has been fed ' + queueItem.get('aboutPet').get('numberFeeds') + ' times');
+		}
+		
 	} catch (e){
 		log.error('[publishFedPet] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);

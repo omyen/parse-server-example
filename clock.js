@@ -95,7 +95,7 @@ function publishFedPet(post, queueItem){
 		post.set('type', 'fedPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
-		post.set('text', queueItem.get('aboutPet').get('name') + ' has been fed ' + queueItem.get('aboutPet').get('timesFed') + ' times');
+		post.set('text', queueItem.get('aboutPet').get('name') + ' has been fed ' + queueItem.get('aboutPet').get('numberFeeds') + ' times');
 	} catch (e){
 		log.error('[publishFedPet] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
@@ -150,7 +150,12 @@ function publishLevelUp(post, queueItem){
 		post.set('type', 'levelUp');
 		post.set('title', queueItem.get('aboutPet').get('name') + ' leveled up');
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
-		post.set('text', queueItem.get('aboutPet').get('name') + ' is a level ' + queueItem.get('newLevel') + ' ' + queueItem.get('aboutPet').get('tagline').get('tagline'))
+		if(queueItem.get('aboutPet').get('tagline')){
+			post.set('text', queueItem.get('aboutPet').get('name') + ' is now a level ' + queueItem.get('newLevel') + ' ' + queueItem.get('aboutPet').get('tagline').get('tagline'));
+		} else {
+			post.set('text', queueItem.get('aboutPet').get('name') + ' is now level ' + queueItem.get('newLevel'));
+		}
+		
 	} catch (e){
 		log.error('[publishLevelUp] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);

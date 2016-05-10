@@ -416,7 +416,9 @@ Parse.Cloud.afterSave('Pet', function(req)
 							feedingReminder.set('minutes', utcMinutes);
 							feedingRemindersToSave.push(feedingReminder);
 						}
-						return Parse.Object.saveAll(feedingRemindersToSave);
+						if(pet.get('feedTimes').length>0){
+							Parse.Object.saveAll(feedingRemindersToSave);
+						}
 					}, function(error){
 						log.debug('[afterSave Pet] Info=\'Failed adding feedingReminders\'  error=' +  error.message);
 					})

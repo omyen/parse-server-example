@@ -95,6 +95,7 @@ function publishFedPet(post, queueItem){
 		post.set('type', 'fedPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' fed ' + queueItem.get('aboutPet').get('name'));
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
+		post.set('text', queueItem.get('aboutPet').get('name') + ' has been fed ' + queueItem.get('aboutPet').get('timesFed') + ' times');
 	} catch (e){
 		log.error('[publishFedPet] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
@@ -116,6 +117,7 @@ function publishNewPetPhoto(post, queueItem){
 		post.set('type', 'newPetPhoto');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' added a photo of ' + queueItem.get('aboutPet').get('name'));
 		post.set('image', queueItem.get('photo'));	
+		post.set('text', 'If it\'s cute, hit the Pat button');
 	} catch (e){
 		log.error('[publishNewPetPhoto] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
@@ -146,8 +148,9 @@ function publishLevelUp(post, queueItem){
 
 	try{
 		post.set('type', 'levelUp');
-		post.set('title', queueItem.get('aboutPet').get('name') + ' is now level ' + queueItem.get('newLevel'));
+		post.set('title', queueItem.get('aboutPet').get('name') + ' leveled up');
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
+		post.set('text', queueItem.get('aboutPet').get('name') + ' is a level ' + queueItem.get('newLevel') + ' ' + queueItem.get('aboutPet').get('tagline').get('tagline'))
 	} catch (e){
 		log.error('[publishLevelUp] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
@@ -167,6 +170,7 @@ function publishNewPet(post, queueItem){
 	try{
 		post.set('type', 'newPet');
 		post.set('title', queueItem.get('causingUser').get('displayName') + ' added a pet ' + queueItem.get('aboutPet').get('name'));	
+		post.set('text', 'Check out ' + queueItem.get('aboutPet').get('name') + '\'s profile');
 	} catch (e){
 		log.error('[publishNewPet] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);
@@ -188,6 +192,7 @@ function publishAd(post, queueItem){
 	try{
 		post.set('type', 'ad');
 		post.set('title', queueItem.get('title'));	
+		post.set('text', queueItem.get('text'));	
 		post.set('image', queueItem.get('photo'));	
 		post.set('url', queueItem.get('url'));	
 	} catch (e){

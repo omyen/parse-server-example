@@ -298,8 +298,8 @@ Parse.Cloud.afterSave('Pet', function(req)
 		for (var i = 0; i < dirtyKeys.length; ++i) {
 			var dirtyKey = dirtyKeys[i];
 			switch(dirtyKey){
-				case 'profilePhoto':
-					log.debug('[afterSave Pet] Info=\'Pet profilePhoto is dirty - queueing post\'');
+				case 'newPhoto':
+					log.debug('[afterSave Pet] Info=\'Pet newPhoto is dirty - queueing post\'');
 					//profilePhoto is the latest photo
 					try{
 
@@ -315,10 +315,10 @@ Parse.Cloud.afterSave('Pet', function(req)
 						queueItem.set('req', req);
 						queueItem.set('causingUser', req.user); 
 						queueItem.set('aboutPet', pet);
-						queueItem.set('photo', pet.get('profilePhoto'));
+						queueItem.set('photo', pet.get('newPhoto'));
 						toSave.push(queueItem);
 					} catch (e){
-						log.error('[afterSave Pet] Info=\'Failed to set post properties for profilePhoto update\' error=' + e.message);
+						log.error('[afterSave Pet] Info=\'Failed to set post properties for newPhoto update\' error=' + e.message);
 						return; 
 					}
 

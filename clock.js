@@ -158,7 +158,7 @@ function publishLevelUp(post, queueItem){
 		post.set('title', queueItem.get('aboutPet').get('name') + ' leveled up');
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
 		if(queueItem.get('aboutPet').get('tagline')){
-			post.set('text', queueItem.get('aboutPet').get('name') + ' is now a level ' + queueItem.get('newLevel') + ' ' + queueItem.get('aboutPet').get('tagline').get('tagline'));
+			post.set('text', queueItem.get('aboutPet').get('name') + ' is now a level ' + queueItem.get('newLevel') + ' ' + queueItem.get('aboutPet').get('taglineText'));
 		} else {
 			post.set('text', queueItem.get('aboutPet').get('name') + ' is now level ' + queueItem.get('newLevel'));
 		}

@@ -396,7 +396,9 @@ function sendFeedRemindersToOwners(feedingReminder){
 
 function sendFeedReminders(){
 	log.info('[sendFeedReminders] Info=\'Running\'');
+	var fractionAfterFeedingDeemedNotFed = 0.5;
 	var now = new Date();
+	var day = new Date(86400000);
 	var utcHours = now.getUTCHours();
 	var utcMinutes = now.getUTCMinutes();
 	var utcTimeMinutes = utcMinutes + 60*utcHours;
@@ -419,12 +421,19 @@ function sendFeedReminders(){
 	query.include('pet');
 
 	var scopeFeedingReminders;
+	
 
 	query.find().then(function(feedingReminders){
 		log.info('[sendFeedReminders] Info=\'Got feedingReminders\' length=' + feedingReminders.length);
 		scopeFeedingReminders = feedingReminders;
 		for(var i = 0; i<feedingReminders.length; i++){
-			sendFeedRemindersToOwners(feedingReminders[i]);
+			var feedsPerDay = feedingReminders[i].get('pet').get('feedsPerDay');
+			var timeBetweenFeeds = day/feedsPerDay;
+			var timeSinceFed = now - feedingReminders[i].get('pet').get('lastFed');
+			var timeAfterFeedDeemedNotFed = timeBetweenFeeds*fractionAfterFeedingDeemedNotFed;
+			if(timeSinceFed>timeAfterFeedDeemedNotFed){
+				sendFeedRemindersToOwners(feedingReminders[i]);
+			}
 		}
 	});
 }

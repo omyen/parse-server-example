@@ -903,8 +903,11 @@ Parse.Cloud.define('patPhoto', function(req, res){
 			pattedBy = [];
 		}
 		pattedBy.push(req.params.userId);
-
 		photo.set('pattedBy', pattedBy);
+
+		if(!photo.get('numberPats')){
+			photo.set('numberPats', 0);
+		}
 		photo.increment('numberPats');
 		return photo.save();
 	}).then(function(result){

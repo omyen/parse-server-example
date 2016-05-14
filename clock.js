@@ -229,6 +229,9 @@ function processQueueItem(queueItem){
 		var now = new Date();
 		var daysSinceEpoch =  Math.floor(now/86400000);
 		post.set('creationDay', daysSinceEpoch);
+		if(queueItem.get('aboutPet')){
+			post.set('item', queueItem.get('aboutPet').get('item'));
+		}
 
 	} catch (e){
 		log.error('[processQueueItem] Info=\'Failed to set post properties\' error=' + e.message);

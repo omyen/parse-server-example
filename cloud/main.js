@@ -869,6 +869,28 @@ Parse.Cloud.define('addFriend', function(req, res) {
 	
 });
 
+Parse.Cloud.define('patPhoto', function(req, res){
+	Parse.Cloud.useMasterKey();
+
+	var Photo = Parse.Object.extend('Photo');
+	var User = Parse.Object.extend('_User');
+
+	var photo = new Photo;
+	photo.id = req.params.photoId;
+
+	photo.fetch().then(function(result){
+		var pattedBy = photo.get('pattedBy');
+		if(!pattedBy){
+			pattedBy = [];
+		}
+		pattedBy.push(req.params.userId);
+
+		photo.set('pattedBy', pattedBy);
+		photo.increment('numberPats');
+		photo.save();
+	});
+});
+
 Parse.Cloud.define('declineRequest', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	log.info('[declineRequest] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);

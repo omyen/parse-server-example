@@ -716,7 +716,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	post.set('type', 'signUp');
 	post.set('title', 'Welcome to Doubledip!');
 	post.set('text', 'This is your activity feed, where you\'ll see everything happening on your network. \
-		Try adding a new pet in the Pets tab, or find your friends in the Friends tab.'
+		Try adding a new pet in the Pets tab, or find your friends in the Friends tab. If you see a list in the app, you can pull down to refresh it.'
 		);
 	post.set('numberPats', 0);
 	promises.push(post.save());
@@ -1024,36 +1024,39 @@ Parse.Cloud.define('postAd', function(req, res) {
 	try{
 
 		log.info('[postAd] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' title=' + req.params.title + ' url=' + req.params.url);
-		if(req.user.getUsername() != 'adPostingUser'){
+		if(req.user.getUsername() == 'adPostingUser'){
+		    var password = req.params.password;
+
+		    Parse.User.logIn(req.user.getUsername(), password).then(function(result){
+				var Photo = Parse.Object.extend('Photo');
+				var photo = new Photo;
+				photo.id = req.params.photoId;
+
+				var PublishQueue = Parse.Object.extend('PublishQueue');
+				var queueItem = new PublishQueue;
+
+				queueItem.set('type', 'ad');
+				queueItem.set('req', req);
+				queueItem.set('photo', photo);
+				queueItem.set('title', req.params.title);
+				queueItem.set('text', req.params.text);
+				queueItem.set('url', req.params.url);
+
+				return queueItem.save();
+		    }, function(error){
+		    	log.error('[postAd] Info=\'bad password\' error=' + error.message);
+				res.error(error.message);
+				return;
+		    }).then(function(result){
+		    	res.success(true);
+		    }, function(error){
+				log.error('[postAd] Info=\'postAd failed\' error=' + error.message);
+				res.error(error.message);
+				return;
+		    });
+		} else {
 			res.error('not auth');
 		}
-
-	    var password = req.params.password;
-
-	    Parse.User.logIn(req.user.getUsername(), password).then(function(result){
-			var Photo = Parse.Object.extend('Photo');
-			var photo = new Photo;
-			photo.id = req.params.photoId;
-
-			var PublishQueue = Parse.Object.extend('PublishQueue');
-			var queueItem = new PublishQueue;
-
-			queueItem.set('type', 'ad');
-			queueItem.set('req', req);
-			queueItem.set('photo', photo);
-			queueItem.set('title', req.params.title);
-			queueItem.set('url', req.params.url);
-
-			return queueItem.save();
-	    }, function(error){
-	    	log.error('[postAd] Info=\'bad password\' error=' + error.message);
-			res.error(error.message);
-	    }).then(function(result){
-	    	res.success(true);
-	    }, function(error){
-			log.error('[postAd] Info=\'postAd failed\' error=' + error.message);
-			res.error(error.message);
-	    });
 
 
 		

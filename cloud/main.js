@@ -707,7 +707,7 @@ Parse.Cloud.define('signUp', function(req, res) {
 	user.set('username_lowercase', req.params.username.toLowerCase()); //for searching
 	user.set('displayName_lowercase', req.params.username.toLowerCase()); //for searching
 	user.set('password', req.params.password);
-	user.set('tagline', '');
+	user.set('tagline', 'Human');
 	user.set('notifications', true);
 	promises.push(user.signUp());
 

@@ -262,7 +262,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 function getXpFromType(pet, xpBar){
 	var currentVal = pet.get(xpBar.get('type'));
-	var xpPerLevel = xpBar.get('xpPerLevel');
+	var xpPerLevel = xpBar.get('xpGivenPerLevel');
 	var level = pet.get(xpBar.get('petLevelField'));
 	var numLevels = xpBar.get('pointsPerLevel').length;
 	var xp = 0;

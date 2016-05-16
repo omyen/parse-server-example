@@ -27,6 +27,11 @@ function sendPushes(users, initiatingUser, type, extraData){
 		var alert;
 		var details = {};
 		switch(type){
+			case 'levelUp':
+				alert = extraData.get('name') + ' can level up';
+				details.pet = extraData;
+				details.goToState = 'tabs.pets_pets'
+				break;
 			case 'fedPet':
 				alert = 'Someone fed one of your pets';
 				details.pet = extraData;
@@ -328,7 +333,11 @@ function checkPetCanLevelUpAndSendNotifications(pet){
 			}
 
 			if ((xp+currentXp)>=nextLevelXp){
-				log.debug(' [checkPetCanLevelUpAndSendNotifications] Info=\'Pet can level up - sending notification\' nextLevelXp=' + nextLevelXp + ' xp=' + xp+currentXp);
+				log.debug(' [checkPetCanLevelUpAndSendNotifications] Info=\'Pet can level up - sending notification\' nextLevelXp=' + nextLevelXp + ' xp=' + (xp+currentXp));
+				var users = [pet.get('administrator')];
+				var dummy = {};
+				dummy.id = '-';
+				sendPushes(users, dummy, 'levelUp', pet);
 			}
 
 		}, function(error){

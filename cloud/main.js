@@ -287,19 +287,19 @@ function checkPetCanLevelUpAndSendNotifications(pet){
 		for (var i = 0; i < dirtyKeys.length; ++i) {
 			var dirtyKey = dirtyKeys[i];
 			switch(dirtyKey){
-				case 'maxPatsOnPost':
+				case 'lastPostTotalPats':
 					shouldCheck = true;
 					break outerloop;
 				case 'lifetimePats':
 					shouldCheck = true;
 					break outerloop;
-				case 'maxOwners':
+				case 'numOwners':
 					shouldCheck = true;
 					break outerloop;
-				case 'numberPhotosAdded':
+				case 'profilePhoto':
 					shouldCheck = true;
 					break outerloop;
-				case 'numberFeeds':
+				case 'lastFeedingLog':
 					shouldCheck = true;
 					break outerloop;
 			}

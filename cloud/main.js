@@ -724,8 +724,9 @@ Parse.Cloud.define('updateNotificationPreference', function(request, response)
 Parse.Cloud.define('checkPassword', function(request, response) 
 {
     var password = request.params.password;
+    var username = request.params.username;
 
-    Parse.User.logIn(request.user.get('username'), password, {
+    Parse.User.logIn(username, password, {
         success: function(results) 
         {   
             response.success(true);

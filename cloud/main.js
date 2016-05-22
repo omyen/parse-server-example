@@ -725,7 +725,7 @@ Parse.Cloud.define('checkPassword', function(request, response)
 {
     var password = request.params.password;
 
-    Parse.User.logIn(request.user.getUsername(), password, {
+    Parse.User.logIn(request.user.get('username'), password, {
         success: function(results) 
         {   
             response.success(true);

@@ -357,6 +357,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 			case 'feedingReminder':
 				alert = extraData.get('name') + ' hasn\'t been fed yet';
 				details.pet = extraData;
+				details.goToState = 'tabs.pets_pets'
 				break;
 			default:
 				return;

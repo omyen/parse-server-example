@@ -160,6 +160,8 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 			pet.set('levelLifetimePats', 1);
 			pet.set('levelMaxOwners', 1);
 
+			pet.set('feedTimes', [27000, 64800]);
+
 			pet.set('numberPhotosAddedToday', 0);
 			pet.set('numberFeedsToday', 0);
 
@@ -192,8 +194,8 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 		for (var i = 0; i < dirtyKeys.length; ++i) {
 			var dirtyKey = dirtyKeys[i];
 			switch(dirtyKey){
-				case 'profilePhoto':
-					log.debug('[beforeSave Pet] Info=\'Pet profilePhoto is dirty - giving XP\'');
+				case 'newPhoto':
+					log.debug('[beforeSave Pet] Info=\'Pet newPhoto is dirty - giving XP\'');
 					try{
 						if(pet.get('numberPhotosAddedToday')<=NEW_PHOTOS_PER_DAY){
 							pet.increment('numberPhotosAdded');
@@ -202,7 +204,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 							log.debug('[beforeSave Pet] Info=\'Too many new photos today, no xp\'');
 						}
 					} catch (e){
-						log.error('[beforeSave Pet] Info=\'Failed to set XP for profilePhoto update\' error=' + e.message);
+						log.error('[beforeSave Pet] Info=\'Failed to set XP for newPhoto update\' error=' + e.message);
 						return; 
 					}
 					break;
@@ -285,6 +287,9 @@ function getXpFromType(pet, xpBar){
 
 function checkPetCanLevelUpAndSendNotifications(pet){
 	try{
+		if(pet.get('lastNotifiedLevel') == pet.get('level')){
+			return;
+		}
 		var shouldCheck = false;
 		var dirtyKeys = pet.get('lastDirtyKeys');
 
@@ -334,6 +339,7 @@ function checkPetCanLevelUpAndSendNotifications(pet){
 
 			if ((xp+currentXp)>=nextLevelXp){
 				log.debug(' [checkPetCanLevelUpAndSendNotifications] Info=\'Pet can level up - sending notification\' nextLevelXp=' + nextLevelXp + ' xp=' + (xp+currentXp));
+				pet.set('lastNotifiedLevel', pet.get('level'));
 				var users = [pet.get('administrator')];
 				var dummy = {};
 				dummy.id = '-';

@@ -754,6 +754,9 @@ Parse.Cloud.define('resetPassword', function(request, response)
 				response.error('username not found');
 			}
 			user = results[0];
+			if(user.get('privateData').get('email') == ''){
+				response.error('no email');
+			}
 			user.setEmail(user.get('privateData').get('email'));
 			return user.save();
 		}).then(function(result){

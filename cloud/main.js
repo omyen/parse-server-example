@@ -743,6 +743,8 @@ Parse.Cloud.define('resetPassword', function(request, response)
 	try{
 	    var username = request.params.username;
 
+	    var user;
+
 		var queryUsername = new Parse.Query("_User");
 		queryUsername.equalTo("username", username);
 		queryUsername.include('privateData');
@@ -751,7 +753,14 @@ Parse.Cloud.define('resetPassword', function(request, response)
 			if(results.length==0) {
 				response.error('username not found');
 			}
-			return Parse.User.requestPasswordReset(results[0].get('privateData').get('email'));
+			user = results[0];
+			user.setEmail(user.get('privateData').get('email'));
+			return user.save();
+		}).then(function(result){
+			return Parse.User.requestPasswordReset(user.getEmail());
+		}).then(function(result){
+			user.setEmail('');
+			return user.save();
 		}).then(function(result){
 			response.success(true);
 		}, function(error){

@@ -38,12 +38,19 @@ var api = new ParseServer({
       android: {
         senderId: process.env.GCM_SENDER_ID,
         apiKey: process.env.GCM_API_KEY
-      }//,
-      // ios: {
-      //   pfx: '/file/path/to/XXX.p12',
-      //   bundleId: '',
-      //   production: false
-      // }
+      },
+      ios: [
+        {
+          pfx: 'DevPush.p12',
+          bundleId: 'com.doubledipcompany.doubledip',
+          production: false
+        },
+        {
+          pfx: 'ProdPush.p12',
+          bundleId: 'com.doubledipcompany.doubledip', 
+          production: true // Prod
+        }
+      ]
     }
 });
 // Client-keys like the javascript key or the .NET key are not necessary with parse-server

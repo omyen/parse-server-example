@@ -64,7 +64,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 		  data: {
 		  	title: 'DoubleDip',
 		    alert: alert,
-		    notId: Math.floor(Math.random() * 1000000000);
+		    notId: Math.floor(Math.random() * 1000000000),
 		    style: "inbox",
         	summaryText: "%n% notifications",
         	content-available: 1,

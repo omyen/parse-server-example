@@ -90,7 +90,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 		  where: query,
 		  data: {
 		  	type: type,
-		  	content-available: 1,
+		  	"content-available": 1,
 		  	details: details
 		  }
 		}, {

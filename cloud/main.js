@@ -33,7 +33,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 				details.goToState = 'tabs.pets_pets'
 				break;
 			case 'fedPet':
-				alert = 'Someone fed one of your pets';
+				alert = 'Someone fed ' + extraData.get('name');
 				details.pet = extraData;
 				details.goToState = 'tabs.pets_pets'
 				break;

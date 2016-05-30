@@ -53,6 +53,9 @@ var api = new ParseServer({
           production: true // Prod
         }
       ]
+    },
+    liveQuery: {
+      classNames: ['Pet']
     }
 });
 // Client-keys like the javascript key or the .NET key are not necessary with parse-server

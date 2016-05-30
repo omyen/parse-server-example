@@ -33,7 +33,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 				details.goToState = 'tabs.pets_pets'
 				break;
 			case 'fedPet':
-				alert = 'Someone fed one of your pets';
+				alert = 'Someone fed ' + extraData.get('name');
 				details.pet = extraData;
 				details.goToState = 'tabs.pets_pets'
 				break;
@@ -1113,7 +1113,7 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 
 Parse.Cloud.define('getPosts', function(req, res) {
 	Parse.Cloud.useMasterKey();
-	log.info('[getPosts] Info=\'Running cloud code\' userId=' + req.params.userId + ' startPost=' + req.params.startPost + ' numPosts=' + req.params.numPosts);
+	log.info('[getPosts] Info=\'Running cloud code\' userId=' + req.params.userId + ' startPost=' + req.params.startPost + ' numPosts=' + req.params.numPosts + ' fromCreatedDate=' + req.params.fromCreatedDate);
 	
 	
 	var User = Parse.Object.extend('_User');
@@ -1121,8 +1121,12 @@ Parse.Cloud.define('getPosts', function(req, res) {
 	user.id = req.params.userId;
 	
 	var queryPosts = user.relation('posts').query();
-	queryPosts.limit(req.params.numPosts);
-	queryPosts.skip(req.params.startPost);
+	if(req.params.fromCreatedDate){
+		queryPosts.greaterThan('createdAt', req.params.fromCreatedDate);
+	} else {
+		queryPosts.limit(req.params.numPosts);
+		queryPosts.skip(req.params.startPost);
+	}
 	queryPosts.include('image');
 	queryPosts.descending('creationDay', 'updatedAt');
 

@@ -42,11 +42,13 @@ var api = new ParseServer({
       ios: [
         {
           pfx: 'DevPush.p12',
+          passphrase: process.env.DEV_PUSH_CERT_PASSPHRASE,
           bundleId: 'com.doubledipcompany.doubledip',
           production: false
         },
         {
           pfx: 'ProdPush.p12',
+          passphrase: process.env.PROD_PUSH_CERT_PASSPHRASE,
           bundleId: 'com.doubledipcompany.doubledip', 
           production: true // Prod
         }

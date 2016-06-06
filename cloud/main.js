@@ -203,9 +203,9 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 				case 'newPhoto':
 					log.debug('[beforeSave Pet] Info=\'Pet newPhoto is dirty - giving XP\'');
 					try{
+						pet.increment('numberPhotosAddedToday');
 						if(pet.get('numberPhotosAddedToday')<=NEW_PHOTOS_PER_DAY){
 							pet.increment('numberPhotosAdded');
-							pet.increment('numberPhotosAddedToday');
 						} else {
 							log.debug('[beforeSave Pet] Info=\'Too many new photos today, no xp\'');
 						}
@@ -218,9 +218,9 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 				case 'lastFeedingLog':
 					log.debug('[beforeSave Pet] Info=\'Pet lastFeedingLog is dirty - giving XP\'');
 					try{
+						pet.increment('numberFeedsToday');
 						if(pet.get('numberFeedsToday')<=NEW_FEEDS_PER_DAY){
 							pet.increment('numberFeeds');
-							pet.increment('numberFeedsToday');
 						} else {
 							log.debug('[beforeSave Pet] Info=\'Too many feeds today, no xp\'');
 						}
@@ -256,6 +256,13 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 						log.error('[beforeSave Pet] Info=\'Failed to set XP for lastPostTotalPats update\' error=' + e.message);
 						return; 
 					}
+					break;
+				case 'itemTop_pc':
+				case 'itemLeft_pc':
+				case 'item':
+				case 'tagline':
+				case 'profilePhoto':
+					pet.increment('numberStylistUpdatesToday');
 					break;
 				default:
 					break;
@@ -1155,6 +1162,7 @@ Parse.Cloud.define('getPosts', function(req, res) {
 		queryPosts.skip(req.params.startPost);
 	}
 	queryPosts.include('image');
+	queryPosts.include('aboutPet');
 	queryPosts.descending('creationDay', 'updatedAt');
 
 	queryPosts.find().then(function(results){

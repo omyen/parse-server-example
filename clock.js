@@ -175,6 +175,26 @@ function publishLevelUp(post, queueItem){
 
 }
 
+function publishStylistUpdate(post, queueItem){
+	log.info('[publishStylistUpdate] Info=\'Processing object\'');
+	log.debug('[publishStylistUpdate] queueItem=%j', queueItem)
+
+	try{
+		post.set('type', 'stylistUpdate');
+		post.set('title', queueItem.get('aboutPet').get('name') + ' got a new look');
+		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
+	} catch (e){
+		log.error('[publishLevelUp] Info=\'Failed to set post properties\' error=' + e.message);
+		return Parse.Promise.error(e);
+	}
+
+	return post.save().then(function(post){
+		log.debug('[publishLevelUp] Info=\'Saved post\'');
+		return propagatePost(post);
+	});
+
+}
+
 function publishNewPet(post, queueItem){
 	log.info('[publishNewPet] Info=\'Processing object\'');
 	log.debug('[publishNewPet] queueItem=%j', queueItem)
@@ -231,6 +251,8 @@ function processQueueItem(queueItem){
 		post.set('creationDay', daysSinceEpoch);
 		if(queueItem.get('aboutPet')&&(queueItem.get('type')!='newPetPhoto')&&(queueItem.get('type')!='ad')){
 			post.set('item', queueItem.get('aboutPet').get('item'));
+			post.set('itemTop_pc', queueItem.get('aboutPet').get('itemTop_pc'));
+			post.set('itemLeft_pc', queueItem.get('aboutPet').get('itemLeft_pc'));
 		}
 
 	} catch (e){
@@ -269,6 +291,14 @@ function processQueueItem(queueItem){
 				queueItem.destroy();
 			}, function(error){
 				log.error('[processQueueItem] Info=\'failed processing levelUp\' error=' + error.message);
+			});
+			break;
+		case 'stylistUpdate':
+			//if success, destroy the item
+			publishStylistUpdate(post, queueItem).then(function(results){
+				queueItem.destroy();
+			}, function(error){
+				log.error('[processQueueItem] Info=\'failed processing stylistUpdate\' error=' + error.message);
 			});
 			break;
 		case 'ad':
@@ -325,6 +355,7 @@ function resetXPDailies(){
 				log.debug('[resetXPDailies] Info=\'Resetting dailies for pet\' pet=' + pets[i].get('name'));
 				pets[i].set('numberPhotosAddedToday', 0);
 				pets[i].set('numberFeedsToday', 0);
+				pets[i].set('numberStylistUpdatesToday', 0);
 				toSave.push(pets[i]);
 			} catch(e){
 				log.error('[resetXPDailies] Info=\'Failed to reset dailies for pet\' error=' + e.message);

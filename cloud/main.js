@@ -170,6 +170,10 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 			pet.set('numberPhotosAddedToday', 0);
 			pet.set('numberFeedsToday', 0);
+			pet.set('numberStylistUpdatesToday', 0);
+
+			pet.set('itemLeft_pc', 0);
+			pet.set('itemTop_pc', 0);
 
 			pet.set('xp', 0);
 			pet.set('level', 1);

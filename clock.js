@@ -183,6 +183,7 @@ function publishStylistUpdate(post, queueItem){
 		post.set('type', 'stylistUpdate');
 		post.set('title', queueItem.get('aboutPet').get('name') + ' got a new look');
 		post.set('image', queueItem.get('aboutPet').get('profilePhoto'));
+		post.set('text', 'Hit the Pat button if ' + queueItem.get('aboutPet').get('name') + ' has got it going on');
 	} catch (e){
 		log.error('[publishLevelUp] Info=\'Failed to set post properties\' error=' + e.message);
 		return Parse.Promise.error(e);

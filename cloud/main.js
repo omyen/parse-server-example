@@ -1167,6 +1167,7 @@ Parse.Cloud.define('getPosts', function(req, res) {
 	}
 	queryPosts.include('image');
 	queryPosts.include('aboutPet');
+	queryPosts.include('aboutPet.profilePhoto');
 	queryPosts.descending('creationDay', 'updatedAt');
 
 	queryPosts.find().then(function(results){

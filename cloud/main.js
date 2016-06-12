@@ -174,6 +174,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 			pet.set('itemLeft_pc', 0);
 			pet.set('itemTop_pc', 0);
+			pet.set('itemSize_pc', 70);
 
 			pet.set('xp', 0);
 			pet.set('level', 1);

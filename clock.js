@@ -254,6 +254,7 @@ function processQueueItem(queueItem){
 			post.set('item', queueItem.get('aboutPet').get('item'));
 			post.set('itemTop_pc', queueItem.get('aboutPet').get('itemTop_pc'));
 			post.set('itemLeft_pc', queueItem.get('aboutPet').get('itemLeft_pc'));
+			post.set('itemSize_pc', queueItem.get('aboutPet').get('itemSize_pc'));
 		}
 
 	} catch (e){

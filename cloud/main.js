@@ -267,7 +267,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 				case 'item':
 				case 'tagline':
 				case 'profilePhoto':
-					if(!stylistChange)
+					if(!stylistChange){
 						stylistChange = true;
 						pet.increment('numberStylistUpdatesToday');
 					}
@@ -547,7 +547,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 				case 'profilePhoto':
 					log.debug('[afterSave Pet] Info=\'Pet had a stylist change - queueing post\'');
 					try{
-						if(stylistChange)
+						if(stylistChange){
 							continue;
 						}
 						stylistChange = true;

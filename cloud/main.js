@@ -200,7 +200,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 		}
 		log.info('[beforeSave Pet] Info=\'Pet\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
 
-
+		var stylistChange = false;
 		//collect info for XP
 		for (var i = 0; i < dirtyKeys.length; ++i) {
 			var dirtyKey = dirtyKeys[i];
@@ -267,7 +267,10 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 				case 'item':
 				case 'tagline':
 				case 'profilePhoto':
-					pet.increment('numberStylistUpdatesToday');
+					if(!stylistChange)
+						stylistChange = true;
+						pet.increment('numberStylistUpdatesToday');
+					}
 					break;
 				default:
 					break;
@@ -407,6 +410,7 @@ Parse.Cloud.afterSave('Pet', function(req)
 
 		var toSave = [];
 
+		var stylistChange = false;
 		//collect info for posts
 		for (var i = 0; i < dirtyKeys.length; ++i) {
 			var dirtyKey = dirtyKeys[i];
@@ -543,6 +547,10 @@ Parse.Cloud.afterSave('Pet', function(req)
 				case 'profilePhoto':
 					log.debug('[afterSave Pet] Info=\'Pet had a stylist change - queueing post\'');
 					try{
+						if(stylistChange)
+							continue;
+						}
+						stylistChange = true;
 
 						if(pet.get('numberStylistUpdatesToday')>NEW_STYLIST_POSTS_PER_PET_PER_DAY){
 							log.debug('[afterSave Pet] Info=\'Pet already updated stylist too many times today - not queueing post\'');

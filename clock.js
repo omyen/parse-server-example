@@ -11,10 +11,12 @@ Parse.Cloud.useMasterKey();
 
 var RETRIES = 2;
 
-function propagateAd(post){
+function propagateAd(post, queueItem){
 	var toSave = [];
 
+	var geopoint = new Parse.GeoPoint(queueItem.get('lat'), queueItem.get('lon'));
 	var query = new Parse.Query("_User");
+	query.withinKilometers('geopoint', geopoint, queueItem.get('km'));
 
 	return query.find().then(function(results){
 		results.forEach(function(user){
@@ -235,7 +237,7 @@ function publishAd(post, queueItem){
 
 	return post.save().then(function(post){
 		log.debug('[publishAd] Info=\'Saved post\'');
-		return propagateAd(post);
+		return propagateAd(post, queueItem);
 	});
 
 }

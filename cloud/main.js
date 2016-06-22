@@ -1208,6 +1208,9 @@ Parse.Cloud.define('postAd', function(req, res) {
 				queueItem.set('title', req.params.title);
 				queueItem.set('text', req.params.text);
 				queueItem.set('url', req.params.url);
+				queueItem.set('lat', req.params.lat);
+				queueItem.set('lon', req.params.lon);
+				queueItem.set('km', req.params.km);
 
 				return queueItem.save();
 		    }, function(error){

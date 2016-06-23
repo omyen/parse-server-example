@@ -373,6 +373,13 @@ function resetXPDailies(){
 		log.error('[resetXPDailies] Info=\'Couldn\'t retrieve pets to reset dailies\' error=' + error.message);
 	});
 
+	//also delete all PushStatuses
+	var pushStatusQuery = new Parse.Query('_PushStatus');
+
+	pushStatusQuery.find().then(function(result){
+		Parse.Object.destroyAll(result);
+	})
+
 	
 }
 

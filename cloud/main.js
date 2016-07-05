@@ -640,39 +640,67 @@ Parse.Cloud.afterSave('Post', function(req)
 
 // Updates image width and height after save
 Parse.Cloud.afterSave("Photo", function(request) {  
-	if(request.object.existed()){
-		return;
+	Parse.Cloud.useMasterKey();
+	var photo = req.object;
+	var dirtyKeys = photo.get('lastDirtyKeys');
+    if(!dirtyKeys) {
+    	log.error('[afterSave Photo] Info=\'No dirtyKeys\'');
+		return; 
+ 	} 
+
+	log.info('[afterSave Photo] Info=\'Photo\' dirtyKeysLength=' + dirtyKeys.length);
+	for (var i = 0; i < dirtyKeys.length; ++i) {
+		var dirtyKey = dirtyKeys[i];
+		switch(dirtyKey){
+			case 'numberPats':
+				log.debug('[afterSave Photo] Info=\'Post numberPats is dirty - giving xp\'');
+				//profilePhoto is the latest photo
+				try{
+					if(photo.get('numberPats')==0){
+						continue;
+					}
+					var pet = photo.get('aboutPet');
+					pet.set('lastPostTotalPats', photo.get('numberPats')); //for stats
+					pet.increment('lifetimePats'); //for stats
+					pet.save();
+				} catch (e){
+					log.error('[afterSave Photo] Info=\'Failed to give xp for numberPats\' error=' + e.message);
+					return; 
+				}
+
+				break;
+			}
 	}
 
-	Parse.Cloud.useMasterKey();
-	log.info("[afterSave Photo]");
-	try{
-	  var imageObject = request.object;
-	  var imageFile = imageObject.get('photo');
-	  var Image = require("parse-image");
-	  Parse.Cloud.httpRequest({url: imageFile.url()}).then(function(response) {
-	        // The file contents are in response.buffer.
-	        log.debug("[afterSave Photo] got imagefile");
-	        var image = new Image();
-	        return image.setData(response.buffer);
-	    }).then(function(result){
-	    	log.debug("[afterSave Photo] set data");
-	      	imageObject.set('width', result.width());
-	      	//log.debug("[afterSave Photo] set width");
-			imageObject.set('height', result.height());
-			//log.debug("[afterSave Photo] set height");
-			imageObject.set('aspectRatio', result.width()/result.height());
-			//log.debug("[afterSave Photo] set aspectRatio");
-			return imageObject.save();
-	    }).then(function(result){
-	    	log.debug("[afterSave Photo] success");
-	    }, function(error) {
-	      // The networking request failed.
-	      log.error("[afterSave Photo] Photo Cannot update image dimensions " + error.code + " : " + error.message);
-	    });
-	} catch (error){
-		log.error("[afterSave Photo] Failed " + error.code + " : " + error.message);
-	}
+	// Parse.Cloud.useMasterKey();
+	// log.info("[afterSave Photo]");
+	// try{
+	//   var imageObject = request.object;
+	//   var imageFile = imageObject.get('photo');
+	//   var Image = require("parse-image");
+	//   Parse.Cloud.httpRequest({url: imageFile.url()}).then(function(response) {
+	//         // The file contents are in response.buffer.
+	//         log.debug("[afterSave Photo] got imagefile");
+	//         var image = new Image();
+	//         return image.setData(response.buffer);
+	//     }).then(function(result){
+	//     	log.debug("[afterSave Photo] set data");
+	//       	imageObject.set('width', result.width());
+	//       	//log.debug("[afterSave Photo] set width");
+	// 		imageObject.set('height', result.height());
+	// 		//log.debug("[afterSave Photo] set height");
+	// 		imageObject.set('aspectRatio', result.width()/result.height());
+	// 		//log.debug("[afterSave Photo] set aspectRatio");
+	// 		return imageObject.save();
+	//     }).then(function(result){
+	//     	log.debug("[afterSave Photo] success");
+	//     }, function(error) {
+	//       // The networking request failed.
+	//       log.error("[afterSave Photo] Photo Cannot update image dimensions " + error.code + " : " + error.message);
+	//     });
+	// } catch (error){
+	// 	log.error("[afterSave Photo] Failed " + error.code + " : " + error.message);
+	// }
 });
 
 //==============================

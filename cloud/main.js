@@ -639,7 +639,7 @@ Parse.Cloud.afterSave('Post', function(req)
 });
 
 // Updates image width and height after save
-Parse.Cloud.afterSave("Photo", function(request) {  
+Parse.Cloud.afterSave("Photo", function(req) {  
 	Parse.Cloud.useMasterKey();
 	var photo = req.object;
 	var dirtyKeys = photo.get('lastDirtyKeys');

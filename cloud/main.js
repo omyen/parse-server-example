@@ -147,6 +147,21 @@ Parse.Cloud.beforeSave('Post', function(req, res)
 	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
 });
 
+Parse.Cloud.beforeSave('Photo', function(req, res) 
+{
+	var photo = req.object;
+	try{
+		var dirtyKeys = photo.dirtyKeys();
+		log.info('[beforeSave Photo] Info=\'Photo\' dirtyKeysLength=' + dirtyKeys.length + ' dirtyKeys=' + dirtyKeys);
+		photo.set('lastDirtyKeys', dirtyKeys);
+	} catch (e){
+		log.error('[beforeSave Photo] Info=\'Failed to set dirtyKeys and XP for photo\' error=' + e.message);
+	}
+	//either way, return success to the user
+	res.success();
+	//can't save any other objects in before save so add a lastDirtykeys for aftersave to look at
+});
+
 
 Parse.Cloud.beforeSave('Pet', function(req, res) 
 {

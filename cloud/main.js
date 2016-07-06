@@ -34,7 +34,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 				details.goToState = 'tabs.pets_pets'
 				break;
 			case 'fedPet':
-				alert = 'Someone fed ' + extraData.get('name');
+				alert = initiatingUser.get('displayName') + ' fed ' + extraData.get('name');
 				details.pet = extraData;
 				details.goToState = 'tabs.pets_pets'
 				break;
@@ -50,6 +50,9 @@ function sendPushes(users, initiatingUser, type, extraData){
 				break;
 			case 'newPost':
 				alert = 'You have new posts';
+				break;
+			case 'canFeed':
+				alert = 'You can now feed ' + extraData.get('name');
 				break;
 			default:
 				return;
@@ -1181,6 +1184,10 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 			log.debug('[setOwnersChanges] Info=\'Adding pet to list\'');
 			relationPets.add(pet);
 			relationFriends.add(user);
+			var users = [user];
+			var dummy = {};
+			dummy.id = '-';
+			sendPushes(users, dummy, 'canFeed', pet);
 		} else {
 			log.debug('[setOwnersChanges] Info=\'Removing pet from list\'');
 			relationPets.remove(pet);

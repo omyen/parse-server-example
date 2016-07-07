@@ -34,7 +34,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 				details.goToState = 'tabs.pets_pets'
 				break;
 			case 'fedPet':
-				alert = initiatingUser.get('displayName') + ' fed ' + extraData.get('name');
+				alert = extraData.get('lastFedByName') + ' fed ' + extraData.get('name');
 				details.pet = extraData;
 				details.goToState = 'tabs.pets_pets'
 				break;
@@ -1187,7 +1187,9 @@ Parse.Cloud.define('setOwnersChanges', function(req, res) {
 			var users = [user];
 			var dummy = {};
 			dummy.id = '-';
-			sendPushes(users, dummy, 'canFeed', pet);
+			pet.fetch().then(function(pet){
+				sendPushes(users, dummy, 'canFeed', pet);
+			});
 		} else {
 			log.debug('[setOwnersChanges] Info=\'Removing pet from list\'');
 			relationPets.remove(pet);

@@ -1139,7 +1139,7 @@ Parse.Cloud.define('addPhotoToPet', function(req, res){
 	pet.fetch().then(function(result){
 		var relationPhotos = pet.relation('photos');
 		relationPhotos.add(photo);
-		if(req.setAsProfilePic){
+		if(req.params.setAsProfilePic){
 			pet.set('profilePhoto', photo);
 		}
 		return $scope.pet.save();

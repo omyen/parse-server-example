@@ -1148,7 +1148,8 @@ Parse.Cloud.define('addPhotoToPet', function(req, res){
 		log.error('[addPhotoToPet] Info=\'pet fetch failed\' error=' + error.message);
 		res.error(error.message);
 	}).then(function(res){
-		res.success(true);
+		log.info('[addPhotoToPet] Info=\'addPhotoToPet success\'');
+		res.success('OK');
 	}, function(error){
 		log.error('[addPhotoToPet] Info=\'addPhotoToPet failed\' error=' + error.message);
 		res.error(error.message);

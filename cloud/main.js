@@ -1134,7 +1134,7 @@ Parse.Cloud.define('addPhotoToPet', function(req, res){
 
 	var photo = new Photo;
 	photo.id = req.params.photoId;
-	var pet = new Photo;
+	var pet = new Pet;
 	pet.id = req.params.petId;
 
 	pet.fetch().then(function(result){

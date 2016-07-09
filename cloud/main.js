@@ -1124,6 +1124,32 @@ Parse.Cloud.define('patPhoto', function(req, res){
 	});
 });
 
+Parse.Cloud.define('addPhotoToPet', function(req, res){
+
+	Parse.Cloud.useMasterKey();
+
+	var Photo = Parse.Object.extend('Photo');
+	var Pet = Parse.Object.extend('Pet');
+
+	var photo = new Photo;
+	photo.id = req.params.photoId;
+	var pet = new Photo;
+	pet.id = req.params.petId;
+
+	pet.fetch().then(function(result){
+		var relationPhotos = pet.relation('photos');
+		relationPhotos.add(photo);
+		if(req.setAsProfilePic){
+			pet.set('profilePhoto', photo);
+		}
+		return $scope.pet.save();
+	}).then(function(res){
+		res.success(true);
+	}, function(error){
+		res.error(error.message);
+	});
+});
+
 Parse.Cloud.define('declineRequest', function(req, res) {
 	Parse.Cloud.useMasterKey();
 	log.info('[declineRequest] Info=\'Running cloud code\' requestedId=' + req.params.requestedId + ' requesterId=' + req.params.requesterId + ' requestId=' + req.params.requestId);

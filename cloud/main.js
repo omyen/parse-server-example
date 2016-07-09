@@ -1127,6 +1127,7 @@ Parse.Cloud.define('patPhoto', function(req, res){
 Parse.Cloud.define('addPhotoToPet', function(req, res){
 
 	Parse.Cloud.useMasterKey();
+	log.info('[addPhotoToPet] Info=\'Running cloud code\' photoId=' + req.params.photoId + ' petId=' + req.params.petId + ' setAsProfilePic=' + req.params.setAsProfilePic);
 
 	var Photo = Parse.Object.extend('Photo');
 	var Pet = Parse.Object.extend('Pet');
@@ -1146,6 +1147,7 @@ Parse.Cloud.define('addPhotoToPet', function(req, res){
 	}).then(function(res){
 		res.success(true);
 	}, function(error){
+		log.error('[addPhotoToPet] Info=\'addPhotoToPet failed\' error=' + error.message);
 		res.error(error.message);
 	});
 });

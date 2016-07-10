@@ -1143,6 +1143,7 @@ Parse.Cloud.define('addPhotoToPet', function(req, res){
 		if(req.params.setAsProfilePic){
 			pet.set('profilePhoto', photo);
 		}
+		pet.set('newPhoto', photo);
 		return pet.save();
 	}, function(error){
 		log.error('[addPhotoToPet] Info=\'pet fetch failed\' error=' + error.message);

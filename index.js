@@ -76,11 +76,6 @@ app.get('/', function(req, res) {
   res.status(200).send('DoubleDip v0.05');
 });
 
-// There will be a test page available on the /test path of your server url
-// Remove this before launching your app
-app.get('/privacy', function(req, res) {
-  res.sendFile(path.join(__dirname, '/public/privacy'));
-});
 
 var port = process.env.PORT || 1337;
 var httpServer = require('http').createServer(app);

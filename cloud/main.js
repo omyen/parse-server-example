@@ -115,6 +115,27 @@ function sendPushes(users, initiatingUser, type, extraData){
 
 //==============================
 //beforeSave
+
+Parse.Cloud.beforeSave("Analytic", function(request, response) {
+	var query = new Parse.Query(Game);
+	query.equalTo("user", request.object.get("user"));
+	query.equalTo("ad", request.object.get("ad"));
+	query.equalTo("event", request.object.get("event"));
+
+	query.first({
+	  success: function(object) {
+	    if (object) {
+	      response.error("Analytic already exists.");
+	    } else {
+	      response.success();
+	    }
+	  },
+	  error: function(error) {
+	    response.error(error.message);
+	  }
+	});
+});
+
 Parse.Cloud.beforeSave('_User', function(req, res) 
 {
 	try{

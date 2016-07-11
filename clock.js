@@ -204,7 +204,7 @@ function publishNewPet(post, queueItem){
 
 	try{
 		post.set('type', 'newPet');
-		post.set('title', queueItem.get('causingUser').get('displayName') + ' added a pet ' + queueItem.get('aboutPet').get('name'));	
+		post.set('title', queueItem.get('causingUser').get('displayName') + ' added a pet called ' + queueItem.get('aboutPet').get('name'));	
 		post.set('text', 'Check out ' + queueItem.get('aboutPet').get('name') + '\'s profile');
 	} catch (e){
 		log.error('[publishNewPet] Info=\'Failed to set post properties\' error=' + e.message);

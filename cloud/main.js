@@ -117,7 +117,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 //beforeSave
 
 Parse.Cloud.beforeSave("Analytic", function(request, response) {
-	var query = new Parse.Query(Game);
+	var query = new Parse.Query("Analytic");
 	query.equalTo("user", request.object.get("user"));
 	query.equalTo("ad", request.object.get("ad"));
 	query.equalTo("event", request.object.get("event"));

@@ -228,6 +228,18 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 
 	//todo jump out if only dailes were reset
 
+	try{
+		var feedtimes = pet.get('feedtimes');
+		if(feedtimes.length>0){
+			uniqueArray = feedtimes.filter(function(item, pos) {
+			    return feedtimes.indexOf(item) == pos;
+			})
+			pet.set('feedTimes', uniqueArray);
+		}
+	} catch (e){
+		log.error('[beforeSave Pet] Info=\'Failed to normalise feedTimes\' error=' + e.message);
+	}
+
 
 
 	try{

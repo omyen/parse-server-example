@@ -229,7 +229,7 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 	//todo jump out if only dailes were reset
 
 	try{
-		var feedtimes = pet.get('feedtimes');
+		var feedtimes = pet.get('feedTimes');
 		if(feedtimes.length>0){
 			uniqueArray = feedtimes.filter(function(item, pos) {
 			    return feedtimes.indexOf(item) == pos;

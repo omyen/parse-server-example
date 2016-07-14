@@ -480,12 +480,16 @@ function sendFeedReminders(){
 			log.info('[sendFeedReminders] Info=\'Got feedingReminders\' length=' + feedingReminders.length);
 			scopeFeedingReminders = feedingReminders;
 			for(var i = 0; i<feedingReminders.length; i++){
-				var feedsPerDay = feedingReminders[i].get('pet').get('feedsPerDay');
-				var timeBetweenFeeds = day/feedsPerDay;
-				var timeSinceFed = now - feedingReminders[i].get('pet').get('lastFed');
-				var timeAfterFeedDeemedNotFed = timeBetweenFeeds*fractionAfterFeedingDeemedNotFed;
-				if(timeSinceFed>timeAfterFeedDeemedNotFed){
-					sendFeedRemindersToOwners(feedingReminders[i]);
+				try{
+					var feedsPerDay = feedingReminders[i].get('pet').get('feedsPerDay');
+					var timeBetweenFeeds = day/feedsPerDay;
+					var timeSinceFed = now - feedingReminders[i].get('pet').get('lastFed');
+					var timeAfterFeedDeemedNotFed = timeBetweenFeeds*fractionAfterFeedingDeemedNotFed;
+					if(timeSinceFed>timeAfterFeedDeemedNotFed){
+						sendFeedRemindersToOwners(feedingReminders[i]);
+					}
+				} catch (e){
+					log.error('[sendFeedReminders] Info=\'Error in loop\' error=' + e.message);
 				}
 			}
 		});

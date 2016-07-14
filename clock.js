@@ -443,7 +443,7 @@ function sendFeedRemindersToOwners(feedingReminder){
  		queryOwners.find().then(function(owners){
 			var dummy = {};
 			sendPushes(owners, dummy, 'feedingReminder', feedingReminder.get('pet'));
-		}
+		});
 	} catch (e){
 		log.error('[sendFeedRemindersToOwners] Info=\'Error\' error=' + e.message);
 	}

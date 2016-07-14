@@ -73,7 +73,7 @@ app.use(mountPath, api);
 
 // Parse Server plays nicely with the rest of your web routes
 app.get('/', function(req, res) {
-  res.status(200).send('DoubleDip v0.05');
+  res.status(200).send('DoubleDip v0.05. For support, email doubledipcompany@gmail.com');
 });
 
 

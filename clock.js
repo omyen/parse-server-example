@@ -438,55 +438,60 @@ function sendPushes(users, initiatingUser, type, extraData){
 } 
 
 function sendFeedRemindersToOwners(feedingReminder){
-	var queryOwners = feedingReminder.get('pet').relation('owners').query();
-	queryOwners.find().then(function(owners){
+	try {
 		var dummy = {};
-		sendPushes(owners, dummy, 'feedingReminder', feedingReminder.get('pet'));
-	});
+		sendPushes([feedingReminder.get('pet').get('administrator')], dummy, 'feedingReminder', feedingReminder.get('pet'));
+	} catch (e){
+		log.error('[sendFeedRemindersToOwners] Info=\'Error\' error=' + e.message);
+	}
 }
 
 function sendFeedReminders(){
-	log.info('[sendFeedReminders] Info=\'Running\'');
-	var fractionAfterFeedingDeemedNotFed = 0.5;
-	var now = new Date();
-	var day = new Date(86400000);
-	var utcHours = now.getUTCHours();
-	var utcMinutes = now.getUTCMinutes();
-	var utcTimeMinutes = utcMinutes + 60*utcHours;
-	var utcTimeMinutesMin = (utcTimeMinutes-7)%1440;
-	var utcTimeMinutesMax = (utcTimeMinutes+8)%1440;
+	try{
+		log.info('[sendFeedReminders] Info=\'Running\'');
+		var fractionAfterFeedingDeemedNotFed = 0.5;
+		var now = new Date();
+		var day = new Date(86400000);
+		var utcHours = now.getUTCHours();
+		var utcMinutes = now.getUTCMinutes();
+		var utcTimeMinutes = utcMinutes + 60*utcHours;
+		var utcTimeMinutesMin = (utcTimeMinutes-7)%1440;
+		var utcTimeMinutesMax = (utcTimeMinutes+8)%1440;
 
-	var FeedingReminder = Parse.Object.extend('FeedingReminder');
-	var query = new Parse.Query(FeedingReminder);
-	if(utcTimeMinutesMin<utcTimeMinutesMax){
-		query.lessThan('minutes', utcTimeMinutesMax);
-		query.greaterThan('minutes', utcTimeMinutesMin);
-	} else {
-		//must be across midnight
-		var queryLess = new Parse.Query(FeedingReminder);
-		var queryMore = new Parse.Query(FeedingReminder);
-		queryLess.lessThan('minutes', utcTimeMinutesMax);
-		queryMore.greaterThan('minutes', utcTimeMinutesMin);
-		query = Parse.Query.or(queryLess, queryMore);
-	}
-	query.include('pet');
-
-	var scopeFeedingReminders;
-	
-
-	query.find().then(function(feedingReminders){
-		log.info('[sendFeedReminders] Info=\'Got feedingReminders\' length=' + feedingReminders.length);
-		scopeFeedingReminders = feedingReminders;
-		for(var i = 0; i<feedingReminders.length; i++){
-			var feedsPerDay = feedingReminders[i].get('pet').get('feedsPerDay');
-			var timeBetweenFeeds = day/feedsPerDay;
-			var timeSinceFed = now - feedingReminders[i].get('pet').get('lastFed');
-			var timeAfterFeedDeemedNotFed = timeBetweenFeeds*fractionAfterFeedingDeemedNotFed;
-			if(timeSinceFed>timeAfterFeedDeemedNotFed){
-				sendFeedRemindersToOwners(feedingReminders[i]);
-			}
+		var FeedingReminder = Parse.Object.extend('FeedingReminder');
+		var query = new Parse.Query(FeedingReminder);
+		if(utcTimeMinutesMin<utcTimeMinutesMax){
+			query.lessThan('minutes', utcTimeMinutesMax);
+			query.greaterThan('minutes', utcTimeMinutesMin);
+		} else {
+			//must be across midnight
+			var queryLess = new Parse.Query(FeedingReminder);
+			var queryMore = new Parse.Query(FeedingReminder);
+			queryLess.lessThan('minutes', utcTimeMinutesMax);
+			queryMore.greaterThan('minutes', utcTimeMinutesMin);
+			query = Parse.Query.or(queryLess, queryMore);
 		}
-	});
+		query.include('pet');
+
+		var scopeFeedingReminders;
+		
+
+		query.find().then(function(feedingReminders){
+			log.info('[sendFeedReminders] Info=\'Got feedingReminders\' length=' + feedingReminders.length);
+			scopeFeedingReminders = feedingReminders;
+			for(var i = 0; i<feedingReminders.length; i++){
+				var feedsPerDay = feedingReminders[i].get('pet').get('feedsPerDay');
+				var timeBetweenFeeds = day/feedsPerDay;
+				var timeSinceFed = now - feedingReminders[i].get('pet').get('lastFed');
+				var timeAfterFeedDeemedNotFed = timeBetweenFeeds*fractionAfterFeedingDeemedNotFed;
+				if(timeSinceFed>timeAfterFeedDeemedNotFed){
+					sendFeedRemindersToOwners(feedingReminders[i]);
+				}
+			}
+		});
+	} catch (e){
+		log.error('[sendFeedReminders] Info=\'Error\' error=' + e.message);
+	}
 }
 
 //======================

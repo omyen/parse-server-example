@@ -439,8 +439,11 @@ function sendPushes(users, initiatingUser, type, extraData){
 
 function sendFeedRemindersToOwners(feedingReminder){
 	try {
-		var dummy = {};
-		sendPushes([feedingReminder.get('pet').get('administrator')], dummy, 'feedingReminder', feedingReminder.get('pet'));
+		var queryOwners = feedingReminder.get('pet').relation('owners').query();
+ 		queryOwners.find().then(function(owners){
+			var dummy = {};
+			sendPushes(owners, dummy, 'feedingReminder', feedingReminder.get('pet'));
+		}
 	} catch (e){
 		log.error('[sendFeedRemindersToOwners] Info=\'Error\' error=' + e.message);
 	}

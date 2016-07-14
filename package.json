@@ -15,7 +15,7 @@
     "log-buffer": "0.0.3",
     "loglevel": "^1.4.0",
     "parse": "~1.8.0",
-    "parse-server": "2.2.10",
+    "parse-server": "2.2.16",
     "parse-image": "0.1.1",
     "moment-timezone": "0.5.4"
   },

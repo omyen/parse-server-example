@@ -428,7 +428,7 @@ function sendPushes(users, initiatingUser, type, extraData){
 		    log.debug('##### PUSH OK');
 		  },
 		  error: function(error) {
-		    log.debug('##### PUSH ERROR');
+		    log.debug('##### PUSH ERROR=' + error.message);
 		  },
 		  useMasterKey: true
 		});
@@ -481,11 +481,13 @@ function sendFeedReminders(){
 			scopeFeedingReminders = feedingReminders;
 			for(var i = 0; i<feedingReminders.length; i++){
 				try{
+					log.info('[sendFeedReminders] Info=\'Got feedingReminder\' pet=' + feedingReminders[i].get('pet').get('name'));
 					var feedsPerDay = feedingReminders[i].get('pet').get('feedsPerDay');
 					var timeBetweenFeeds = day/feedsPerDay;
 					var timeSinceFed = now - feedingReminders[i].get('pet').get('lastFed');
 					var timeAfterFeedDeemedNotFed = timeBetweenFeeds*fractionAfterFeedingDeemedNotFed;
 					if(timeSinceFed>timeAfterFeedDeemedNotFed){
+						log.info('[sendFeedReminders] Info=\'Sending feedingReminder\' pet=' + feedingReminders[i].get('pet').get('name'));
 						sendFeedRemindersToOwners(feedingReminders[i]);
 					}
 				} catch (e){

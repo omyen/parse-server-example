@@ -136,7 +136,7 @@ Parse.Cloud.beforeSave("Analytic", function(request, response) {
 	});
 });
 
-Parse.Cloud.beforeSave("Installation", function(request, response) {
+Parse.Cloud.beforeSave("_Installation", function(request, response) {
 	try{
 		log.debug('[beforeSave Installation] Info=\'Running\'');
 		var query = new Parse.Query("Installation");

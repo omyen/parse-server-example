@@ -56,7 +56,7 @@ var api = new ParseServer({
     },
     liveQuery: {
       classNames: ['Pet']
-    }
+    },
     oauth: {
      facebook: {
        appIds: process.env.FACEBOOK_APP_ID

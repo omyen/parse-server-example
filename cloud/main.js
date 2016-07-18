@@ -138,8 +138,8 @@ Parse.Cloud.beforeSave("Analytic", function(request, response) {
 
 Parse.Cloud.beforeSave("_Installation", function(request, response) {
 	try{
-		log.debug('[beforeSave Installation] Info=\'Running\'');
-		var query = new Parse.Query("Installation");
+		log.debug('[beforeSave Installation] Info=\'Running\' user=' + request.object.get("user"));
+		var query = new Parse.Query(Parse.Installation);
 		query.equalTo("user", request.object.get("user"));
 
 		query.find().then(function(result){
@@ -151,7 +151,7 @@ Parse.Cloud.beforeSave("_Installation", function(request, response) {
 				}
 			}
 			log.debug('[beforeSave Installation] Info=\'Destroying\' numToDestroy=' + toDestroy.length);
-			return toDestroy.destroyAll();
+			return Parse.Object.destroyAll(toDestroy);
 		}).then(function(result){
 			log.debug('[beforeSave Installation] Info=\'Destroyed\'');
 			response.success();

@@ -137,23 +137,31 @@ Parse.Cloud.beforeSave("Analytic", function(request, response) {
 });
 
 Parse.Cloud.beforeSave("Installation", function(request, response) {
-	var query = new Parse.Query("Installation");
-	query.equalTo("user", request.object.get("user"));
+	try{
+		log.debug('[beforeSave Installation] Info=\'Running\'');
+		var query = new Parse.Query("Installation");
+		query.equalTo("user", request.object.get("user"));
 
-	query.find().then(function(result){
-		var toDestroy = [];
-		for(var i = 0; i<result.length; i++){
-			if(result[i].id != request.object.id){
-				toDestroy.push(result[i]);
+		query.find().then(function(result){
+			log.debug('[beforeSave Installation] Info=\'Found installations\' length=' + result.length);
+			var toDestroy = [];
+			for(var i = 0; i<result.length; i++){
+				if(result[i].id != request.object.id){
+					toDestroy.push(result[i]);
+				}
 			}
-		}
-		return toDestroy.destroyAll();
-	}).then(function(result){
-		response.success();
-	}, function(error){
-		log.error('[beforeSave Installation] Info=\'Error - saved anyway\' error=' + error.message);
-		response.success();
-	});
+			log.debug('[beforeSave Installation] Info=\'Destroying\' numToDestroy=' + toDestroy.length);
+			return toDestroy.destroyAll();
+		}).then(function(result){
+			log.debug('[beforeSave Installation] Info=\'Destroyed\'');
+			response.success();
+		}, function(error){
+			log.error('[beforeSave Installation] Info=\'Error - saved anyway\' error=' + error.message);
+			response.success();
+		});
+	} catch (e){
+		log.error('[beforeSave Installation] Info=\'Error\' error=' + e.message);
+	}
 });
 
 Parse.Cloud.beforeSave('_User', function(req, res) 

@@ -263,6 +263,9 @@ Parse.Cloud.beforeSave('Pet', function(req, res)
 			    return feedtimes.indexOf(item) == pos;
 			})
 			pet.set('feedTimes', uniqueArray);
+			pet.set('feedsPerDay', uniqueArray.length);
+		} else {
+			pet.set('feedsPerDay', 1);
 		}
 	} catch (e){
 		log.error('[beforeSave Pet] Info=\'Failed to normalise feedTimes\' error=' + e.message);
